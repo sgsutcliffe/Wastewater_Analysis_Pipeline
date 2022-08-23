@@ -1,7 +1,4 @@
-# Waster Analysis Pipeline
-Work in progress
-
-# Running Instructions
+# Running Freyja Instructions
 
 Dependencies:
 - Singularity > 3.0 (tested on 3.6.4)
@@ -9,12 +6,13 @@ Dependencies:
 
 ## Required Files for Running
 
-In the workspace directory, or the directory where you store all the files the pipeline needs to run:
+In the workspace directory, or the directort where you store all the files Freyja pipeline needs to run:
 
 Files required:
 
 * Freyja_parallelization_V3.1.py #Python script for parallelization execution of QC, Freyja update, and Freyja. Runs eight samples simultaneously
 * sample_list #This you will need to make yourself depending on the samples [See more information below]
+* usher_update_V2.py #This is a modified version of Freyja's update function to fix some bugs that came up running it on some servers
 
 Files if not downloaded will be downloaded
 * Homo_sapiens.GRCh38.fa/.fa.amb/.fa.ann/.fa.bwt/.fa.pac/.fa.sa/ # BWA index for human genome
