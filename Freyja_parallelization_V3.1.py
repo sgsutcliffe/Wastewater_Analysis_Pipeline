@@ -111,7 +111,7 @@ if __name__ == "__main__":
 	if not os.path.exists("{0}Homo_sapiens.GRCh38.fa.bwt".format(workspace_path)):
 		os.system("wget --quiet -O {0}Homo_sapiens.GRCh38.dna.alt.fa.gz http://ftp.ensembl.org/pub/release-107/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.alt.fa.gz".format(workspace_path))
 		os.system("gzip -d {0}Homo_sapiens.GRCh38.dna.alt.fa.gz".format(workspace_path))
-		os.system("mv {0}Homo_sapiens.GRCh38.dna.alt.fa.gz {0}Homo_sapiens.GRCh38.fa".format(workspace_path))
+		os.system("mv {0}Homo_sapiens.GRCh38.dna.alt.fa {0}Homo_sapiens.GRCh38.fa".format(workspace_path))
 		os.system("bwa index -p {0}Homo_sapiens.GRCh38.fa {0}Homo_sapiens.GRCh38.fa".format(workspace_path))
 
 	#Making sure that Wuhan reference SARS genome BWA index is downloaded
