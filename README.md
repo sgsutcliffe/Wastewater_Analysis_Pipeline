@@ -14,8 +14,8 @@ Files required:
 * sample_list #This you will need to make yourself depending on the samples [See more information below]
 * usher_update_V2.py #This is a modified version of Freyja's update function to fix some bugs that came up running it on some servers
 
-Files if not downloaded will be downloaded:
-    Note: The downloading of human genome & building bwa index files take a while. I'd suggest running this first without any samples before analyzing samples.
+Files if not downloaded will be downloaded:    
+   Note: The downloading of human genome & building bwa index files take a while. I'd suggest running this first without any samples before analyzing samples.
 * Homo_sapiens.GRCh38.fa/.fa.amb/.fa.ann/.fa.bwt/.fa.pac/.fa.sa/ # BWA index for human genome
 * MN908947_3.fasta/.amb/.ann/.bwt/.fai/.pac/.fasta.sa/.gb #BWA index of the reference Wuhan strain Accession: MN908947 
 * SARS-CoV-2.primer.bed #Artic V4.1 primer BED file for iVar primer trimming
