@@ -1,4 +1,4 @@
-# Waster_Analysis_Pipeline
+# Waster Analysis Pipeline
 Work in progress
 
 # Running Instructions
