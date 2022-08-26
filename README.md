@@ -56,6 +56,7 @@ Right now the order of variables and location of where it is run is very importa
 
 Where you execute the command is also important. You'll need to execute the singularity command in the parent directory of all the folders because you will need to bind this folder and all its sub-folders into the containers /mnt directory.
 
+![](directory_example)
 directory_from_which_you_excute_the_singularity
     |
     | - mounted_directory (The parent directory to sub-directories involved in analysis. The /mnt directory in the container)
