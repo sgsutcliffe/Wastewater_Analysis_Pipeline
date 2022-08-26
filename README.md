@@ -58,15 +58,6 @@ Where you execute the command is also important. You'll need to execute the sing
 
 ![](directory_example.jpeg)
 
-directory_from_which_you_excute_the_singularity
-    |
-    | - mounted_directory (The parent directory to sub-directories involved in analysis. The /mnt directory in the container)
-        |
-        | - /path/to/container
-        | - /path/to/working/directory
-        | - /path/to/sequences/
-        | - /etc/
-
 For more information on mounting directories see: https://docs.sylabs.io/guides/3.0/user-guide/bind_paths_and_mounts.html
 But when creating variables to run the pipeline do not change the '/mnt' in the path
 
