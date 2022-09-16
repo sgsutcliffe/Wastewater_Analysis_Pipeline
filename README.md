@@ -1,4 +1,4 @@
-# Running Freyja Instructions
+# Running Wastewater Analysis Instructions
 
 Dependencies:
 - Singularity > 3.0 (tested on 3.6.4)
