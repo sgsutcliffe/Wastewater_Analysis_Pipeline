@@ -4,12 +4,10 @@ import sys
 import subprocess
 import requests
 import pandas as pd
-#import ssl
-#import certifi
 import yaml
 
-#ssl._create_default_https_context = ssl._create_unverified_context
-
+#NOTE: This is modification of https://github.com/andersen-lab/Freyja Freyja update command. I created this specifically just to bypass issues I was having
+# with urllib.request on one server
 
 def download_tree(locDir):
 	url = "http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/"\
