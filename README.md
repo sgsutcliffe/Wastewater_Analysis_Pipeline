@@ -13,7 +13,7 @@ Files required:
 
 * Freyja_parallelization_V3.1.py #Python script for parallelization execution of QC, Freyja update, and Freyja. Runs eight samples simultaneously
 * sample_list #This you will need to make yourself depending on the samples [See more information below]
-* usher_update_V2.py #This is a modified version of Freyja's update function to fix some bugs that came up running it on some servers
+* usher_update_V2.py #This is a modified version of Freyja's update function to fix some bugs that came up running it on some servers. I would recommend running 'freyja update' instead
 
 Files if not downloaded will be downloaded:    
    Note: The downloading of human genome & building bwa index files take a while. I'd suggest running this first without any samples before analyzing samples.
