@@ -1,4 +1,5 @@
 # Running Wastewater Analysis Instructions
+The pipeline is largely using Freyja: https://github.com/andersen-lab/Freyja
 
 Dependencies:
 - Singularity > 3.0 (tested on 3.6.4)
