@@ -202,7 +202,7 @@ if __name__ == '__main__':
 	down_date = subprocess.check_output("curl http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.version.txt | awk -F'[()]' '{print $2}'", shell=True)
 	down_date = down_date.decode("utf-8").split("\n")
 	down_date = down_date[0]
-	barcode = "usher_barcodes_" + down_date + "_.csv"
+	barcode = "usher_barcodes_" + down_date + ".csv"
 	df_barcodes.to_csv(os.path.join(locDir, barcode))
 	# delete files generated along the way that aren't needed anymore
 	print('Cleaning up')
