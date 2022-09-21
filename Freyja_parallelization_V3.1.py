@@ -35,7 +35,7 @@ def run_core_iPMVC(wp_path,current_sample, nb_t_profiling, smpl_path, usherbarco
 	# Freyja commnad
 	os.system("samtools sort -o {0}{1}_ivartrim_sorted.bam {0}{1}_ivartrim.bam".format(output_folder, current_sample))
 
-	os.system("freyja variants {2}{1}_ivartrim_sorted.bam --variants {2}{1}_variantout --depths {2}{1}_depthout --ref {0}MN908947_3.fasta".format(wp_path, current_sample, output_folder))
+	os.system("freyja variants {2}{1}_ivartrim_sorted.bam --variants {2}{1}_variantout --depths {2}{1}_depthout --ref {0}MN908947_3.fa".format(wp_path, current_sample, output_folder))
 
 	os.system("freyja demix {3}{1}_variantout.tsv {3}{1}_depthout --barcodes {0}{2} --output {3}results/{1}_output".format(wp_path, current_sample, usherbarcodes, output_folder))
 	print("echo {1} >> {0}Already_analyzed_samples.txt".format(wp_path, current_sample))
