@@ -11,6 +11,20 @@ import subprocess
 #time feedback
 start_time = time.time()
 
+#Make lineage distribution plot
+def plot(out_folder):
+	if ((out_folder[len(out_folder)-1]) != "/"):
+		out_folder = "{0}/".format(out_folder)
+
+	out_folder_results = out_folder
+	aggregate_out_tsv = os.path.join(out_folder_results,"aggregate.tsv")
+	plot_out_categories_pdf =  os.path.join(out_folder_results,"plot_categories.pdf")
+	plot_out_lineages_pdf =  os.path.join(out_folder_results,"plot_lineages.pdf")
+
+	os.system("freyja aggregate {0} --output {1}".format(out_folder_results + "results/",aggregate_out_tsv))
+	os.system("freyja plot {0} --output {1}".format(aggregate_out_tsv,plot_out_categories_pdf))
+	os.system("freyja plot {0} --lineages --output {1}".format(aggregate_out_tsv,plot_out_lineages_pdf))
+
 #A function that execute the recurring step of this pipeline 
 def run_core_iPMVC(wp_path,current_sample, nb_t_profiling, smpl_path, usherbarcodes, output_folder):
 	# Quality Control: trimming, automatic adapters removal and low complexity reads removal
@@ -38,6 +52,8 @@ def run_core_iPMVC(wp_path,current_sample, nb_t_profiling, smpl_path, usherbarco
 	os.system("freyja variants {2}{1}_ivartrim_sorted.bam --variants {2}{1}_variantout --depths {2}{1}_depthout --ref {0}MN908947_3.fa".format(wp_path, current_sample, output_folder))
 
 	os.system("freyja demix {3}{1}_variantout.tsv {3}{1}_depthout --barcodes {0}{2} --output {3}results/{1}_output".format(wp_path, current_sample, usherbarcodes, output_folder))
+	#run boostrsap
+	os.system("freyja boot {3}{1}_variantout.tsv {3}{1}_depthout --barcodes {0}{2} --nt 5 --nb 100 --output_base {3}{1} --boxplot pdf".format(wp_path, current_sample, usherbarcodes, output_folder))
 	print("echo {1} >> {0}Already_analyzed_samples.txt".format(wp_path, current_sample))
 	os.system("echo {1} >> {0}Already_analyzed_samples.txt".format(wp_path, current_sample))  
 
@@ -230,3 +246,5 @@ if __name__ == "__main__":
 			for p in processes:
 				while (p.is_alive()):
 					time.sleep(5)
+	#Make lineage distribution plot
+	plot(output_folder)
