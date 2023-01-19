@@ -1,0 +1,134 @@
+Bootstrap: docker
+From: ubuntu:22.04
+
+%setup
+    
+
+%files
+
+%environment
+    export PATH=/opt/miniconda3/bin:$PATH
+    export PYTHONPATH=/opt/miniconda3/bin:$PATH
+    export PATH=$PATH:/opt/samtools-1.10/bin
+    PICARD='/opt/picard.jar'
+    export PICARD
+    LANG=C.UTF-8 LC_ALL=C.UTF-8
+
+%post
+    #Ubuntu installations
+    apt-get -y update && apt-get -y upgrade && apt-get -y install sudo
+    sudo apt-get -y install wget libz-dev bzip2 gcc make libbz2-dev libncurses5-dev libncursesw5-dev liblzma-dev curl libcurl4-openssl-dev \
+    autotools-dev autoconf nano gawk g++  
+    
+    sudo apt-get update
+    sudo apt-get install -y apt-transport-https apt-utils software-properties-common
+    sudo apt-get install -y add-apt-key
+    sudo apt-get update
+    sudo apt-get install -y apt-transport-https apt-utils software-properties-common
+    sudo apt-get install -y add-apt-key
+    apt-get -y install dialog apt-utils
+    export DEBIAN_FRONTEND=noninteractive
+    ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime
+    sudo apt-get install -y tzdata
+    sudo dpkg-reconfigure --frontend noninteractive tzdata
+
+
+    #R install 
+   
+    sudo apt-get -qq install -y --no-install-recommends tzdata apt-utils
+    ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime
+    dpkg-reconfigure --frontend noninteractive tzdata
+    sudo apt -y install dirmngr gnupg apt-transport-https ca-certificates software-properties-common
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+    sudo add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu focal-cran40/'
+    wget http://security.ubuntu.com/ubuntu/pool/main/i/icu/libicu66_66.1-2ubuntu2_amd64.deb
+    sudo apt update && sudo dpkg -i libicu66_66.1-2ubuntu2_amd64.deb
+    sudo apt -y install r-base-dev
+    
+    #Install Freyja in /opt
+    cd /opt
+
+    #Install iVar & Dependencies of Freyja
+
+    #HTSlib 1.15.1
+    wget https://github.com/samtools/htslib/releases/download/1.15.1/htslib-1.15.1.tar.bz2
+    tar -xvjf htslib-1.15.1.tar.bz2
+    rm htslib-1.15.1.tar.bz2
+    cd htslib-1.15.1
+    make
+
+    #samtools 1.10
+    wget https://sourceforge.net/projects/samtools/files/samtools/1.10/samtools-1.10.tar.bz2
+    tar -xvjf samtools-1.10.tar.bz2
+    rm samtools-1.10.tar.bz2
+    cd samtools-1.10 
+    make
+    make sample_id=/opt/samtools-1.10 install
+    export PATH=$PATH:/opt/samtools-1.10/bin
+
+    #Conda 4.13.0 & Python 3.9.12
+    #I couldn't find the repo version for 4.13.0 on repo.continuum as it is under 'latest' if issues arrive than replace with
+    #wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.13.0-Linux-x86_64.sh
+    wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+    sh Miniconda3-latest-Linux-x86_64.sh -b -p /opt/miniconda3
+    . /opt/miniconda3/etc/profile.d/conda.sh
+    export PATH="/opt/miniconda3/bin:$PATH"
+    conda update -n base conda -y
+    conda clean --all --yes
+    conda config --add channels conda-forge
+    conda config --add channels bioconda
+    conda config --add channels defaults
+
+    #Below I will put all the conda package versions
+
+    #iVar 1.3.1
+
+    conda install -y -c conda-forge ivar=1.3.1
+
+    #UShER 0.5.6
+
+    conda install -y -c conda-forge usher=0.5.6
+
+    #cvxpy 1.2.1
+
+    conda install -y -c conda-forge cvxpy=1.2.1
+
+    #numpy 1.22.3
+
+    conda install -y -c conda-forge numpy=1.22.3
+
+    #pandas=1.4.3
+
+    conda install -y -c conda-forge pandas=1.4.3
+
+    #freyja=1.3.8
+
+    conda install -y -c conda-forge freyja=1.3.8
+
+    #bwa 0.7.17
+
+    conda install -y -c conda-forge bwa=0.7.17
+
+    #fastp 0.23.2
+
+    conda install -y -c conda-forge fastp=0.23.2
+    conda clean --all --yes
+
+    #Tools added to Version 6 (for adding the quality control software)
+    conda install -y -c conda-forge fastqc=0.11.9
+
+    conda install -y -c conda-forge kraken2=2.1.2
+
+    #conda install -y -c conda-forge picard=2.27.4
+
+    #conda update picard
+
+    conda install -y -c conda-forge mosdepth=0.3.3
+
+    conda install -y -c conda-forge multiqc=1.13a
+
+    #Trying to install picard in a non-conda way to have it work with R-base
+    cd ../..
+    wget https://github.com/broadinstitute/picard/releases/download/2.27.5/picard.jar
+    #PICARD='/opt/picard.jar'
+    #alias picard="java -jar $PICARD"
