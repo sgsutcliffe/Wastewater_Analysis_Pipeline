@@ -35,7 +35,7 @@ def run_core_iPMVC(wp_path,current_sample, nb_t_profiling, smpl_path, usherbarco
 	
 	#Compress, sort and filter alignment
 	
-	os.system("samtools view -bS {0}{1}_preprocessed.sam > {0}{1}_preprocessed.bam && {0}{1}_preprocessed.sam".format(output_folder, current_sample))
+	os.system("samtools view -bS {0}{1}_preprocessed.sam > {0}{1}_preprocessed.bam && rm {0}{1}_preprocessed.sam".format(output_folder, current_sample))
 	os.system("samtools sort {0}{1}_preprocessed.bam -o {0}{1}_preprocessed_sorted.bam".format(output_folder, current_sample))
 	
 	os.system("ivar trim -i {2}{1}_preprocessed_sorted.bam -b {0}SARS-CoV-2.primer.bed -p {2}{1}_ivartrim".format(wp_path, current_sample,output_folder))
@@ -45,8 +45,8 @@ def run_core_iPMVC(wp_path,current_sample, nb_t_profiling, smpl_path, usherbarco
 	os.system("freyja variants {2}{1}_ivartrim_sorted.bam --variants {2}{1}_variantout --depths {2}{1}_depthout --ref {0}MN908947_3.fa".format(wp_path, current_sample, output_folder))
 
 	os.system("freyja demix {3}{1}_variantout.tsv {3}{1}_depthout --barcodes {0}{2} --output {3}results/{1}_output".format(wp_path, current_sample, usherbarcodes, output_folder))
-	if os.path.exists("{2}results/{0}_output".format(current_sample,output_folder)):
-		glob.glob("date | date '+%F' >> {1}results/{0}_output".format(current_sample, output_folder))
+	if os.path.exists("{1}results/{0}_output".format(current_sample,output_folder)):
+		#glob.glob("date | date '+%F' >> {1}results/{0}_output".format(current_sample, output_folder)) #Removed adding the time-stamp as I don't use it
 		print("echo {1} >> {0}Already_analyzed_samples.txt".format(wp_path, current_sample))
 		os.system("echo {1} >> {0}Already_analyzed_samples.txt".format(wp_path, current_sample))  
 
