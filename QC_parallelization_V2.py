@@ -41,13 +41,13 @@ def run_QC(wp_path, current_sample, nb_t_profiling, smpl_path, output_folder, in
 	os.system("samtools stats --threads {2} --ref-seq {3}MN908947_3.fa {4}{1}_preprocessed_sorted.bam > {0}qc_results/{1}.preiVar.stats".format(output_folder, current_sample, nb_t_profiling, wp_path, input_folder))
 	os.system("samtools depth {4}{1}_preprocessed_sorted.bam > {0}qc_results/{1}.preiVar.common_depth_report".format(output_folder, current_sample, nb_t_profiling, wp_path, input_folder))
 	# Picard seems to be failing also due heavy memory use might re-run this step seperately too
-	os.system("java -jar /opt/picard.jar -Xmx5g CollectMultipleMetrics --INPUT {4}{1}_preprocessed_sorted.bam --OUTPUT {0}qc_results/{1}.preiVar.CollectMultipleMetrics --REFERENCE_SEQUENCE {3}MN908947_3.fa".format(output_folder, current_sample, nb_t_profiling, wp_path, input_folder))
+	os.system("java -Xmx5g -jar /opt/picard.jar CollectMultipleMetrics --INPUT {4}{1}_preprocessed_sorted.bam --OUTPUT {0}qc_results/{1}.preiVar.CollectMultipleMetrics --REFERENCE_SEQUENCE {3}MN908947_3.fa".format(output_folder, current_sample, nb_t_profiling, wp_path, input_folder))
 	#	Step4b: Alingment-level QC on alignment of human decontaminated reads to reference genome (postiVar)
 	os.system("samtools flagstat --threads {2} {3}{1}_ivartrim_sorted.bam > {0}qc_results/{1}.postiVar.flagstat".format(output_folder, current_sample, nb_t_profiling, input_folder))
 	os.system("samtools idxstats {3}{1}_ivartrim_sorted.bam > {0}qc_results/{1}.postiVar.idxstats".format(output_folder, current_sample, nb_t_profiling, input_folder))
 	os.system("samtools stats --threads {2} --ref-seq {3}MN908947_3.fa {4}{1}_ivartrim_sorted.bam > {0}qc_results/{1}.postiVar.stats".format(output_folder, current_sample, nb_t_profiling, wp_path, input_folder))
 	os.system("samtools depth {4}{1}_ivartrim_sorted.bam > {0}qc_results/{1}.postiVar.common_depth_report".format(output_folder, current_sample, nb_t_profiling, wp_path, input_folder))
-	os.system("java -jar /opt/picard.jar -Xmx5g CollectMultipleMetrics --INPUT {4}{1}_ivartrim_sorted.bam --OUTPUT {0}qc_results/{1}.postiVar.CollectMultipleMetrics --REFERENCE_SEQUENCE {3}MN908947_3.fa".format(output_folder, current_sample, nb_t_profiling, wp_path, input_folder))
+	os.system("java -Xmx5g  -jar /opt/picard.jar CollectMultipleMetrics --INPUT {4}{1}_ivartrim_sorted.bam --OUTPUT {0}qc_results/{1}.postiVar.CollectMultipleMetrics --REFERENCE_SEQUENCE {3}MN908947_3.fa".format(output_folder, current_sample, nb_t_profiling, wp_path, input_folder))
     
     #	Final Step: check for completion
 	print("echo {1} >> {0}QC_analyzed_samples.txt".format(wp_path, current_sample))
