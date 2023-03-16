@@ -24,7 +24,7 @@ def run_QC(wp_path, current_sample, nb_t_profiling, smpl_path, output_folder, in
 	os.system("fastqc -q --threads {1} {2}{0}_R1_001.fastq.gz {2}{0}_R2_001.fastq.gz --outdir {3}qc_results/".format(current_sample, nb_t_profiling, smpl_path, output_folder))
 	# Generates a fastqc.zip and fastqc.html file per each sequence (forward and reverse)
 	#	Step 2: Read Clean Status via fastp 0.23.2 (move the JSON file to qc_results)
-	os.system("fastp -i {2}{0}_R1_001.fastq.gz -I {2}{0}_R2_001.fastq.gz -o {3}{0}_R1_001_trimmed_1.fastq.gz -O {3}{0}_R2_001_trimmed_2.fastq.gz -l 70 -x --cut_tail --cut_tail_mean_quality 20 --detect_adapter_for_pe --thread {1} --json {3}{0}.fastp.json".format(current_sample, nb_t_profiling, smpl_path, output_folder))
+	os.system("fastp -i {2}{0}_R1_001.fastq.gz -I {2}{0}_R2_001.fastq.gz -o {3}{0}_R1_001_trimmed_1.fastq.gz -O {3}{0}_R2_001_trimmed_2.fastq.gz -l 70 -x --cut_tail --cut_tail_mean_quality 20 --detect_adapter_for_pe --thread {1} --json {3}qc_results/{0}.fastp.json".format(current_sample, nb_t_profiling, smpl_path, output_folder))
 
 	#	Step 2b: Check Read Clean Status post fastp with fastqc
 	os.system("fastqc -q --threads {1} {4}{0}_R1_001_trimmed_1.fastq.gz {4}{0}_R2_001_trimmed_2.fastq.gz --outdir {3}qc_results/".format(current_sample, nb_t_profiling, output_folder, wp_path, input_folder))
