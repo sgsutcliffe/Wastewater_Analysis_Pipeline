@@ -131,9 +131,17 @@ ${run_location}QC_parallelization_V2.py ${run_location} ${sample_location} ${sam
 ## File checking (Not Working Currently)
 file_check_V1.py is a scipt that looks for all the outputs of the files and puts it into a CSV file. This is still in development and does not work. I need change the path to files in the script to make it work. Also it requires samtools be installed. Samtools is installed in the singularity container, but I do not have instructions yet written for this. The same goes for file_check_visualize.R which visualizes this output.[Soon to come]
 
-## Visualaztion of Freyja output
+## Visualization of Freyja output
 
 Freyja has a visualization feature pre-installed. This is not an option for the pipeline. I think some cleaning up of lineage-calls should be done before visuallizing. The scripts I have written to tackle this require too much manual curation to make available. If you are interested contact me sgsutcliffe[at]gmail.com 
+
+## I will be adding Kraken2 database path as option to allow users to point to databases downloaded elsewhere
+
+## I am also going to add an ouput that tracks nonsynonmous mutations found in wastewater 
+
+## I will also be looking to generate a table output of key QC-metrics for tracking sample quality.
+
+## Lastly I will be putting this into a workflow manager (e.g. Snakemake)
 
 
 
