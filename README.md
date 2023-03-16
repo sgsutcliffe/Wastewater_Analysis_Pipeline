@@ -30,6 +30,7 @@ Files if not downloaded will be downloaded:
 * Homo_sapiens.GRCh38.fa/.fa.amb/.fa.ann/.fa.bwt/.fa.pac/.fa.sa/ # BWA index for human genome
 * MN908947_3.fasta/.amb/.ann/.bwt/.fai/.pac/.fasta.sa/.gb #BWA index of the reference Wuhan strain Accession: MN908947 
 * SARS-CoV-2.primer.bed #Artic V4.1 primer BED file for iVar primer trimming
+* Kraken2wViruses #Kraken2 database built with contaminants the user wants to look for. Instructions below
 
 You'll also need the container of singularity for Freyja
 
@@ -45,6 +46,13 @@ You'll need Singularity Version 3 or greater installed and root permissions
 sudo singularity build Freyja_V6.sif Freyja_Definition_File_V6
 
 ```
+
+### Building Kraken2 database
+
+```shell
+singularity exec --no-home /path/to/container/Freyja_V6.sif kraken2-build --standard --db /path/to/run/location/Kraken2wViruses
+```
+Note: This will build the entire Kraken2 database which is quite large and require a lot of memory to build (~100GB). For instructions on customizing the build and speeding up the process using multiple-threads see https://github.com/DerrickWood/kraken2/wiki/Manual I would recommend including all viruses and human-genome in the build at the very least.
 
 ### Recipe for making sample list
 
