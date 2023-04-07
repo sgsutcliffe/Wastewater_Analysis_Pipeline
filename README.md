@@ -54,6 +54,8 @@ singularity exec --no-home /path/to/container/Freyja_V6.sif kraken2-build --stan
 ```
 Note: This will build the entire Kraken2 database which is quite large and require a lot of memory to build (~100GB). For instructions on customizing the build and speeding up the process using multiple-threads see https://github.com/DerrickWood/kraken2/wiki/Manual I would recommend including all viruses and human-genome in the build at the very least.
 
+For users of digital alliance. If you add mugqic modules to your profile (https://genpipes.readthedocs.io/en/genpipes-v4.4.0/deploy/access_gp_pre_installed.html) Then you can use the module mugqic/kraken2/2.1.0 and point to /cvmfs/soft.mugqic/CentOS6/software/kraken2/kraken2-2.1.0/db which does not have the Wu-Han SARS-CoV-2 genome but one that is very close.
+
 ### Recipe for making sample list
 
 The paired reads that come from C3G have the extensions and right now the pipeline expects this:
