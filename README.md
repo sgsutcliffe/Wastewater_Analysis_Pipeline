@@ -5,6 +5,9 @@ Dependencies:
 - Singularity > 3.0 (tested on 3.6.4)
 - Python 3 (tested on 3.7.7)
 
+Requirements:
+- Running USHER barcode updates was tested with at least 8GB of memory. (If you get error lineagePaths.txt not found likely a memory issue)
+
 ## January 19 Updates
 - Added in two steps for Quality control 1) QC_parallelization_V2.py 2) file_checking_V1.py [In Development] (more below)
 - Updated the pipeline script to version 4.2 Freyja_parallelization_V4.2.py
