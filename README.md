@@ -49,6 +49,7 @@ You'll need Singularity Version 3 or greater installed and root permissions
 sudo singularity build Freyja_V6.sif Freyja_Definition_File_V6
 
 ```
+Note: This creates a compressed read-only squashfs file system suitable for production. If you want to have a writable file-system (writable ext3 or (ch)root directory) try the options --writable or --sandbox. Respectively. 
 
 ### Building Kraken2 database
 
@@ -109,6 +110,7 @@ Barcode update options (include at the end of command):
 -fupdate : uses the built-in freyja update command, this is still-in development, as it breaks if it cannot make a secure connection to hosted databases
 If no option is present it will simply run whichever barcode the user specified. Barcodes are updated daily, and it will warn you if the barcode is out-of-date.
 
+
 ## Running the Quality-Control pipeline
 
 The input_directory : This is the output_directory of the previous step
@@ -130,6 +132,7 @@ ${container} python3 \
 ${run_location}QC_parallelization_V2.py ${run_location} ${sample_location} ${sample_list} ${threads_per_sample} ${barcode} ${output_directory}
 
 ```
+Note: MultiQC, taking all the information and putting it into one html file, takes a lot of tmp memory. If you have a lot of samples I suggest making a tmp folder to mount. eg. your/var/tmp:/var/tmp,your/tmp:/tmp That way you'll have whatever space is available on your machine.
 
 ## In Development
 
