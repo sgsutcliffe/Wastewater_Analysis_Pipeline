@@ -35,7 +35,7 @@ In the workspace directory, or the directory where you store all the files Freyj
 Files required:
 * sample_list #This you will need to make yourself depending on the samples [See more section below]
 
-Files will be downloaded into the working directory if not present when running Freyja_parallelization_V5.1.py:    
+Files will be downloaded into the working directory if not present when running Freyja_parallelization.py:    
 * Homo_sapiens.GRCh38.fa/.fa.amb/.fa.ann/.fa.bwt/.fa.pac/.fa.sa/ # BWA index for human genome
 * MN908947_3.fasta/.amb/.ann/.bwt/.fai/.pac/.fasta.sa/.gb #BWA index of the reference Wuhan strain Accession: MN908947 
 * SARS-CoV-2.primer.bed #Artic V4.1 primer BED file for iVar primer trimming
