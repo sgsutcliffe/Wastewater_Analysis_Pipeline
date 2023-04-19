@@ -66,7 +66,7 @@ Note: I know this is a drag for anyone using reads with a different naming schem
 The 'sample_list' file is just a text file with all the <sample_name> involved in seperate line. I use a quick bash one liner to make the list
 
 ```shell
-ls <path>/<to>/<reads>/*.fastq.gz | sed "s/<path>/<to>/<reads>\///" | sed "s/_R[0-9]_001.fastq.gz//" | sort | uniq > <path>/<to>/<workspace>/sample_list
+ls <path>/<to>/<reads>/*.fastq.gz | sed "s/<path>/<to>/<reads>\//" | sed "s/_R[0-9]_001.fastq.gz//" | sort | uniq > <path>/<to>/<workspace>/sample_list
 ```
 
 ## Running the pipeline
