@@ -1,5 +1,6 @@
 Bootstrap: docker
 From: ubuntu:22.04
+#Version Freyja_Definition_File_V7
 #Version 6 -> 7
 #For my internal tracking this definition file V7.2.g
 #Added in the software Bedtools, jq, and snpEff 
