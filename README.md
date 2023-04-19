@@ -81,25 +81,25 @@ python3 Freyja_parallelization.py Workspace Sample-list
 By default it will use the most up-to-date Usherbarcodes, and run 4 samples at a time with 4 threads per sample.
 This assumes everything not in Workspace directory is in the current directory.
 
-positional arguments:
+###positional arguments:
   workspace_path        The path to directory where: reference files, databases, sample list, usherbarcodes are.
   samples_list_file     Text file with samples to be run. Used to identify input and output files. The pattern is <sample_name>_R[1-2]_001.fastq.gz
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -s SAMPLE_PATH, --sample_path SAMPLE_PATH
+###optional arguments:
+  - -h, --help            show this help message and exit
+  - -s SAMPLE_PATH, --sample_path SAMPLE_PATH
                         Default: Current working directory.
-  -t THREADS, --threads THREADS
+  - -t THREADS, --threads THREADS
                         Default: 4 Threads available should be > threads multiplied by samples run in parallel
-  -b BARCODE, --barcode BARCODE
+  - -b BARCODE, --barcode BARCODE
                         Default: Will download/build most recent. Format: usher_barcodes_yyyy-mm-dd.csv
-  -u, --update          Will update barcodes the latest barcodes
-  -o OUTPUT, --output OUTPUT
+  - -u, --update          Will update barcodes the latest barcodes
+  - -o OUTPUT, --output OUTPUT
                         Default: Current working directory. Will make directory specified if not found
-  -n PARALLEL, --parallel PARALLEL
+  - -n PARALLEL, --parallel PARALLEL
                         Default: 4 Number of samples run in parallel.
-  -f, --file_check      Option generates a file checking file/figure to confirm if everything was created
-  -d DATE, --date DATE  If you want to download a specific usher barcode date. Put date in yyyy-mm-dd
+  - -f, --file_check      Option generates a file checking file/figure to confirm if everything was created
+  - -d DATE, --date DATE  If you want to download a specific usher barcode date. Put date in yyyy-mm-dd
 
 After you've run this step you can run the QC_parallelization.py
 
@@ -107,25 +107,25 @@ After you've run this step you can run the QC_parallelization.py
 python3 QC_parallelization.py Workspace Sample-list
 ```
 
-positional arguments:
+###positional arguments:
   workspace_path        The path to directory where: reference files, databases, sample list, usherbarcodes are.
   samples_list_file     Text file with samples to be run. Used to identify input and output files. The pattern is <sample_name>_R[1-2]_001.fastq.gz
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -s SAMPLE_PATH, --sample_path SAMPLE_PATH
+###optional arguments:
+  - -h, --help            show this help message and exit
+  - -s SAMPLE_PATH, --sample_path SAMPLE_PATH
                         Default: Current working directory. The location of raw FASTQ files
-  -i INPUT_PATH, --input_path INPUT_PATH
+  - -i INPUT_PATH, --input_path INPUT_PATH
                         Default: Current working directory. The ouput directory location of previous Freyja pipeline
-  -t THREADS, --threads THREADS
+  - -t THREADS, --threads THREADS
                         Default: 4 Threads available should be > threads multiplied by samples run in parallel
-  -o OUTPUT, --output OUTPUT
+  - -o OUTPUT, --output OUTPUT
                         Default: Current working directory. Will make directory specified if not found
-  -n PARALLEL, --parallel PARALLEL
+  - -n PARALLEL, --parallel PARALLEL
                         Default: 4 Number of samples run in parallel.
-  -k KRAKEN, --kraken KRAKEN
+  - -k KRAKEN, --kraken KRAKEN
                         Default: Kraken2wViruses, Directory of Kraken database. If running on Digital Alliance servers see option -mugqic
-  -x, --single          When you have too many files for one MultiQC report run each seperately
+  - -x, --single          When you have too many files for one MultiQC report run each seperately
 
 
 ## Running Freyja using the singularity container
