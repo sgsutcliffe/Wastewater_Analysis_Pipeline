@@ -44,6 +44,93 @@ To build yourself:
 * Kraken2 database built with contaminants the user wants to look for. Instructions below (needs a minimum SARS-CoV-2 and Human Genome)
 * snpEff database [if not using singularity container]
 
+## Building Kraken2 database
+
+```shell
+kraken2-build --standard --threads 24  --db /path/to/run/location/Kraken2wViruses
+```
+Note: This will build the entire Kraken2 database which is quite large and require a lot of memory to build (~100GB). For instructions on customizing the build and speeding up the process using multiple-threads see https://github.com/DerrickWood/kraken2/wiki/Manual I would recommend including all viruses and human-genome in the build at the very least.
+
+I don't know if it is my build or server but I could not get a build to work. I instead used one from here:
+https://benlangmead.github.io/aws-indexes/k2
+For my analysis it was https://genome-idx.s3.amazonaws.com/kraken/k2_standard_20230314.tar.gz 
+
+### Recipe for making sample list
+
+The paired reads that come from C3G have the extensions and right now the pipeline expects this:
+R1 = <sample_name>_R1_001.fastq.gz
+R2 = <sample_name>_R2_001.fastq.gz
+
+Note: I know this is a drag for anyone using reads with a different naming scheme. I will fix this if indeed anyone else uses this pipeline! So ping me.
+
+The 'sample_list' file is just a text file with all the <sample_name> involved in seperate line. I use a quick bash one liner to make the list
+
+```shell
+ls <path>/<to>/<reads>/*.fastq.gz | sed "s/<path>/<to>/<reads>\///" | sed "s/_R[0-9]_001.fastq.gz//" | sort | uniq > <path>/<to>/<workspace>/sample_list
+```
+
+## Running the pipeline
+
+There are two scripts Freyja_parallelization.py and QC_parallelization.py
+
+The first Freyja_parallelization.py includes the sample preprocessing, Freyja, and snpEff/iVar variant calling.
+
+```shell
+python3 Freyja_parallelization.py Workspace Sample-list
+```
+By default it will use the most up-to-date Usherbarcodes, and run 4 samples at a time with 4 threads per sample.
+This assumes everything not in Workspace directory is in the current directory.
+
+positional arguments:
+  workspace_path        The path to directory where: reference files, databases, sample list, usherbarcodes are.
+  samples_list_file     Text file with samples to be run. Used to identify input and output files. The pattern is <sample_name>_R[1-2]_001.fastq.gz
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -s SAMPLE_PATH, --sample_path SAMPLE_PATH
+                        Default: Current working directory.
+  -t THREADS, --threads THREADS
+                        Default: 4 Threads available should be > threads multiplied by samples run in parallel
+  -b BARCODE, --barcode BARCODE
+                        Default: Will download/build most recent. Format: usher_barcodes_yyyy-mm-dd.csv
+  -u, --update          Will update barcodes the latest barcodes
+  -o OUTPUT, --output OUTPUT
+                        Default: Current working directory. Will make directory specified if not found
+  -n PARALLEL, --parallel PARALLEL
+                        Default: 4 Number of samples run in parallel.
+  -f, --file_check      Option generates a file checking file/figure to confirm if everything was created
+  -d DATE, --date DATE  If you want to download a specific usher barcode date. Put date in yyyy-mm-dd
+
+After you've run this step you can run the QC_parallelization.py
+
+```shell
+python3 QC_parallelization.py Workspace Sample-list
+```
+
+positional arguments:
+  workspace_path        The path to directory where: reference files, databases, sample list, usherbarcodes are.
+  samples_list_file     Text file with samples to be run. Used to identify input and output files. The pattern is <sample_name>_R[1-2]_001.fastq.gz
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -s SAMPLE_PATH, --sample_path SAMPLE_PATH
+                        Default: Current working directory. The location of raw FASTQ files
+  -i INPUT_PATH, --input_path INPUT_PATH
+                        Default: Current working directory. The ouput directory location of previous Freyja pipeline
+  -t THREADS, --threads THREADS
+                        Default: 4 Threads available should be > threads multiplied by samples run in parallel
+  -o OUTPUT, --output OUTPUT
+                        Default: Current working directory. Will make directory specified if not found
+  -n PARALLEL, --parallel PARALLEL
+                        Default: 4 Number of samples run in parallel.
+  -k KRAKEN, --kraken KRAKEN
+                        Default: Kraken2wViruses, Directory of Kraken database. If running on Digital Alliance servers see option -mugqic
+  -x, --single          When you have too many files for one MultiQC report run each seperately
+
+
+## Running Freyja using the singularity container
+
+The first step is to build the container/
 
 ## Building singularity container
 
@@ -53,113 +140,36 @@ The list of dependencies will be included in Frey
 
 ```shell
 
-sudo singularity build Freyja_V7.sif Freyja_Definition_File_V7
+sudo singularity build Freyja.sif Singularity-Definition-Files/Freyja_Definition_File
 
 ```
-Note: This creates a compressed read-only squashfs file system suitable for production. If you want to have a writable file-system (writable ext3 or (ch)root directory) try the options --writable or --sandbox. Respectively. 
+Note: This creates a compressed read-only squashfs file system suitable for production. If you want to have a writable file-system (writable ext3 or (ch)root directory) try the options --writable or --sandbox. Respectively. You can also name the container whatever you like!
 
-## Building Kraken2 database
+## Running singularity container
+
+Since everything will be installed within the container you just need execute the container before running the script.
+
+The simplest way is
+```shell
+singularity exec Freyja.sif python3 ...
+```
+
+Some suggestions for a more complex way to run it is
+```shell
+singularity exec -C -B ${PWD}:${HOME}
+```
+This keeps other install issues from conflicting. This binds your current working directory to the containers home directory.
+
+One last suggestion is that some tools like MultiQC want to write to the temp directory but the space here is not what you have available on your computer but within the build.
+My suggesttion is to make some temp directory on your file system for the container to use.
+
+In this example I made directories /var/tmp and /tmp which are bound to the containers /var/tmp and /tmp respectively then run 
 
 ```shell
-singularity exec --no-home /path/to/container/Freyja_V7.sif kraken2-build --standard --threads 24  --db /path/to/run/location/Kraken2wViruses
-```
-Note: This will build the entire Kraken2 database which is quite large and require a lot of memory to build (~100GB). For instructions on customizing the build and speeding up the process using multiple-threads see https://github.com/DerrickWood/kraken2/wiki/Manual I would recommend including all viruses and human-genome in the build at the very least.
-
-For users of digital alliance. If you add mugqic modules to your profile (https://genpipes.readthedocs.io/en/genpipes-v4.4.0/deploy/access_gp_pre_installed.html) Then you can use the module mugqic/kraken2/2.1.0 and point to /cvmfs/soft.mugqic/CentOS6/software/kraken2/kraken2-2.1.0/db which does not have the Wu-Han SARS-CoV-2 genome but one that is very close.
-
-### Recipe for making sample list
-
-The paired reads that come from C3G have the extensions and right now the pipeline expects this:
-R1 = <sample_name>_R1_001.fastq.gz
-R2 = <sample_name>_R2_001.fastq.gz
-
-Note: Sometimes samples are run in two different lanes and need to be merged. 
-
-The 'sample_list' file is just a text file with all the <sample_name> involved in seperate line. I use a quick bash one liner to make the list
-
-```shell
-ls <path>/<to>/<reads>/*.fastq.gz | sed "s/<path>/<to>/<reads>\///" | sed "s/_R[0-9]_001.fastq.gz//" | sort | uniq > <path>/<to>/<workspace>/sample_list
+singularity exec -C -B ${PWD}:${HOME},/your/path/var/tmp:/var/tmp\,/your/path/tmp:/tmp python ...
 ```
 
-## Running Freyja using the singularity container
-Note: The pipeline is parallel in the sense it runs 8 samples at a time, regardless of how many blocks-of-memory/threads are available. This will be updated in the snakemake workflow. But keep this in mind when selecting threads per sample and how much memory you allocate per sample.
+## Overview
 
-Right now the order of variables and location of where it is run is very important.
-
-Where you execute the command is also important. You'll need to execute the singularity command in the parent directory of all the folders because you will need to bind this folder and all its sub-folders into the containers /mnt directory.
-
-![](directory_example.jpeg)
-
-For more information on mounting directories see: https://docs.sylabs.io/guides/3.0/user-guide/bind_paths_and_mounts.html
-But when creating variables to run the pipeline do not change the '/mnt' in the path
-
-If you don't have any usherbarcodes already downloaded you can just put:
-'usherbarcode.csv' and add the option to either -update/-fupdate at the end of the command (see below)
-
-Note: Order of the parameters matters
-```shell
-mounted_directory=<mounted_directory_name>
-container=/path/to/singularity_container/Freyja_V6.sif
-run_location=/mnt/path/to/workspace/directory/
-sample_location=/mnt/path/to/reads/
-sample_list=/path/to/sample/list/<sample_list_file>
-threads_per_sample=<interger>
-barcode=<usher_barcode_file>
-output_directory=/mnt/<output_folder_name>
-
-singularity exec --no-home -B ${mounted_directory}:/mnt \
-${container} python3 \
-${run_location}Freyja_parallelization_V4.2.py ${run_location} ${sample_location} ${sample_list} ${threads_per_sample} ${barcode} ${output_directory}
-
-```
-Barcode update options (include at the end of command):
--update : uses the modified freyja update command, less secure but I have confirmed that it can be run on multiple OS/servers
--fupdate : uses the built-in freyja update command, this is still-in development, as it breaks if it cannot make a secure connection to hosted databases
-If no option is present it will simply run whichever barcode the user specified. Barcodes are updated daily, and it will warn you if the barcode is out-of-date.
-
-
-## Running the Quality-Control pipeline
-
-The input_directory : This is the output_directory of the previous step
-The new output_directory : This is where you want to the QC files to go
-
-```shell
-mounted_directory=<mounted_directory_name>
-container=/path/to/singularity_container/Freyja_V6.sif
-run_location=/mnt/path/to/workspace/directory/
-sample_location=/mnt/path/to/reads/
-sample_list=/path/to/sample/list/<sample_list_file>
-threads_per_sample=<interger>
-barcode=<usher_barcode_file>
-output_directory=/mnt/<output_folder_name>
-input_directory=/mnt/<input_folder_name>
-
-singularity exec --no-home -B ${mounted_directory}:/mnt \
-${container} python3 \
-${run_location}QC_parallelization_V2.py ${run_location} ${sample_location} ${sample_list} ${threads_per_sample} ${barcode} ${output_directory}
-
-```
-Note: MultiQC, taking all the information and putting it into one html file, takes a lot of tmp memory. If you have a lot of samples I suggest making a tmp folder to mount. eg. your/var/tmp:/var/tmp,your/tmp:/tmp That way you'll have whatever space is available on your machine.
-
-## In Development
-
-## File checking (Not Working Currently)
-file_check_V1.py is a scipt that looks for all the outputs of the files and puts it into a CSV file. This is still in development and does not work. I need change the path to files in the script to make it work. Also it requires samtools be installed. Samtools is installed in the singularity container, but I do not have instructions yet written for this. The same goes for file_check_visualize.R which visualizes this output.[Soon to come]
-
-## Visualization of Freyja output
-
-Freyja has a visualization feature pre-installed. This is not an option for the pipeline. I think some cleaning up of lineage-calls should be done before visuallizing. The scripts I have written to tackle this require too much manual curation to make available. If you are interested contact me sgsutcliffe[at]gmail.com 
-
-## I will be adding Kraken2 database path as option to allow users to point to databases downloaded elsewhere
-
-## I am also going to add an ouput that tracks nonsynonmous mutations found in wastewater 
-
-## I will also be looking to generate a table output of key QC-metrics for tracking sample quality.
-
-## Lastly I will be putting this into a workflow manager (e.g. Snakemake)
-
-
-
-
-
+![](Misc/Analysis%20Workflow.png)
 
