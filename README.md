@@ -28,13 +28,6 @@ Optional:
 Requirements:
 - USHER barcode update requires at least 8GB of memory. (If you get error lineagePaths.txt not found likely a memory issue)
 
-## January 19 Updates
-- Added in two steps for Quality control 1) QC_parallelization_V2.py 2) file_checking_V1.py [In Development] (more below)
-- Updated the pipeline script to version 4.2 Freyja_parallelization_V4.2.py
-   - This version reduces the number of intermediate files and switches to compressed fasta/fastq files
-   - Added a "-update/-fupdate" option to turn on usher-barcode updates
-   - Does not include the Freyja visualization command
-- Updated the Singularity container (Freyja_V6.sif) to accomodate the QC pipeline
 
 ## Required Files for Running
 
