@@ -1,12 +1,32 @@
 # Running Wastewater Analysis Instructions
-The pipeline is largely using Freyja: https://github.com/andersen-lab/Freyja
 
-Dependencies:
-- Singularity > 3.0 (tested on 3.6.4)
-- Python 3 (tested on 3.7.7)
+A pipeline for SARS-CoV-2 analysis on wastewater samples. Created specifically for my needs of analyzing pair-short-read sequences from tiled-amplicon PCR using Arctic V4.1 primer-set of SARS-CoV-2. The pipeline is under active development as of April 19, 2023, and I will be adding features and updates to make it more versatile. It is largely to python scripts. The first includes sample preprocessing, Freyja relative abundance estimates of lineages, and mutation calling. The second runs a sample quality control pipeline and outputs a MultiQC report and quantative report.
+
+You can install all the software required (below) to run the pipeline, which is a lot, or build the singularity container to run everything.
+
+Dependencies (versions listed have been tested):
+- Python 3 (tested on 3.9.12)
+   - pyvcf 0.6.8
+   - numpy 1.22.3
+   - pandas 1.4.3
+- R version 4.2.2
+- Samtools 1.16.1
+- Picard 2.27.4
+- iVar 1.3.1
+- Freyja 1.3.12
+- BWA 0.7.17
+- Fastp 0.23.2
+- FastQC 0.11.9
+- Kraken2 2.1.2
+- MultiQC 1.13
+- snpEff 4.5 covid19
+- bedtools 2.30.0
+
+Optional:
+   - Singularity > 3.0 (tested on 3.6.4)
 
 Requirements:
-- Running USHER barcode updates was tested with at least 8GB of memory. (If you get error lineagePaths.txt not found likely a memory issue)
+- USHER barcode update requires at least 8GB of memory. (If you get error lineagePaths.txt not found likely a memory issue)
 
 ## January 19 Updates
 - Added in two steps for Quality control 1) QC_parallelization_V2.py 2) file_checking_V1.py [In Development] (more below)
