@@ -28,46 +28,40 @@ Optional:
 Requirements:
 - USHER barcode update requires at least 8GB of memory. (If you get error lineagePaths.txt not found likely a memory issue)
 
-
-## Required Files for Running
+## Get reference files required files
 
 In the workspace directory, or the directory where you store all the files Freyja pipeline needs to run:
 
 Files required:
+* sample_list #This you will need to make yourself depending on the samples [See more section below]
 
-* Freyja_parallelization_V4.2.py #Python script for parallelization execution, Freyja update, and Freyja. Runs eight samples simultaneously
-* sample_list #This you will need to make yourself depending on the samples [See more information below]
-* usher_update_V2.py #This is a modified version of Freyja's update function to fix some bugs that came up running it on some servers. I would recommend running 'freyja update' instead
-* QC_parallelization_V2.py #This generates a multiQC file and a number of files with information on run
-* file_checking_V1.py #This simply checks that all the files have been generated and if freyja output meets a minimum criteria
-
-Files if not downloaded will be downloaded:    
-   Note: The downloading of human genome & building bwa index files take a while. I'd suggest running this first without any samples before analyzing samples. WARNING: I use wget to connect to the websites. If you need a more secure file-transfer download them prior to running script.
+Files will be downloaded into the working directory if not present when running Freyja_parallelization_V5.1.py:    
 * Homo_sapiens.GRCh38.fa/.fa.amb/.fa.ann/.fa.bwt/.fa.pac/.fa.sa/ # BWA index for human genome
 * MN908947_3.fasta/.amb/.ann/.bwt/.fai/.pac/.fasta.sa/.gb #BWA index of the reference Wuhan strain Accession: MN908947 
 * SARS-CoV-2.primer.bed #Artic V4.1 primer BED file for iVar primer trimming
-* Kraken2wViruses #Kraken2 database built with contaminants the user wants to look for. Instructions below
 
-You'll also need the container of singularity for Freyja
+To build yourself:
+* Kraken2 database built with contaminants the user wants to look for. Instructions below (needs a minimum SARS-CoV-2 and Human Genome)
+* snpEff database [if not using singularity container]
 
-* Freyja_V6.sif #You'll need to build with sudo permissions
-* Freyja_Definition_File_V6 #This is the definition file for building the container
 
-### Building singularity container
+## Building singularity container
 
 You'll need Singularity Version 3 or greater installed and root permissions
 
+The list of dependencies will be included in Frey
+
 ```shell
 
-sudo singularity build Freyja_V6.sif Freyja_Definition_File_V6
+sudo singularity build Freyja_V7.sif Freyja_Definition_File_V7
 
 ```
 Note: This creates a compressed read-only squashfs file system suitable for production. If you want to have a writable file-system (writable ext3 or (ch)root directory) try the options --writable or --sandbox. Respectively. 
 
-### Building Kraken2 database
+## Building Kraken2 database
 
 ```shell
-singularity exec --no-home /path/to/container/Freyja_V6.sif kraken2-build --standard --db /path/to/run/location/Kraken2wViruses
+singularity exec --no-home /path/to/container/Freyja_V7.sif kraken2-build --standard --threads 24  --db /path/to/run/location/Kraken2wViruses
 ```
 Note: This will build the entire Kraken2 database which is quite large and require a lot of memory to build (~100GB). For instructions on customizing the build and speeding up the process using multiple-threads see https://github.com/DerrickWood/kraken2/wiki/Manual I would recommend including all viruses and human-genome in the build at the very least.
 

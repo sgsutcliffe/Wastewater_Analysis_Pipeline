@@ -100,8 +100,8 @@ if __name__ == "__main__":
 			 help = "Default: 4 Number of samples run in parallel.") #Optional
 	parser.add_argument("-k", "--kraken", default = "Kraken2wViruses",
 			 help = "Default: Kraken2wViruses, Directory of Kraken database. If running on Digital Alliance servers see option -mugqic") #Optional
-	parser.add_argument("-m", "--mugqic", action="store_true",
-			 help = "Only for Digital Alliance Users: Use the mugqic kraken2 database version of files") #Optional
+	#parser.add_argument("-m", "--mugqic", action="store_true",
+			 #help = "Only for Digital Alliance Users: Use the mugqic kraken2 database version of files") #Optional
 	parser.add_argument("-x", "--single", action="store_true",
 			 help = "When you have too many files for one MultiQC report run each seperately") #Optional
 	
@@ -183,8 +183,8 @@ if __name__ == "__main__":
 	#Path to users Kraken2 database or by default Kraken2wViruses in the Workspace
 	kraken_db = args.kraken
 	#If the flag mugqic flag is raised then negate the Kraken2 databse and use the one provided on Digital Alliance by C3G MUGQIQ
-	if args.mugqic:
-		kraken_db = "/cvmfs/soft.mugqic/CentOS6/software/kraken2/kraken2-2.1.0/db"
+	#if args.mugqic:
+		#kraken_db = "/cvmfs/soft.mugqic/CentOS6/software/kraken2/kraken2-2.1.0/db"
 	if args.kraken:
 		if not os.path.exists("{0}".format(kraken_db)):
 			print("The Kraken database you have listed could not be found. You listed " + kraken_db)
