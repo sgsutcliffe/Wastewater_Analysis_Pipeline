@@ -1,4 +1,6 @@
 # Read data and select columns
+#Version
+#file_check_visualize_V1
 ### Arguments ###
 args = commandArgs(trailingOnly=TRUE)
 df_file_check <- read.delim(args[1], sep = '\t')

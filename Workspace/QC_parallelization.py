@@ -1,5 +1,5 @@
 #!/bin/python3.6
-
+#Version QC_parallelization_V3
 #Script for parrallelization of QC steps on WW analysis
 import sys
 import time
@@ -253,6 +253,6 @@ if __name__ == "__main__":
 		os.system("multiqc {0}qc_results/ -o {0}qc_results/multiqc_data".format(output))
 
 	#Step 7: Generate a quantative report
-	os.system("python3 {0}QC-data-table-script-V1.py {0} {1} {2} {3}qc_results/ {3}qc_results/".format(workspace_path, input_folder, samples_list_file, output))
+	os.system("python3 {0}QC-data-table-script.py {0} {1} {2} {3}qc_results/ {3}qc_results/".format(workspace_path, input_folder, samples_list_file, output))
 	
 	

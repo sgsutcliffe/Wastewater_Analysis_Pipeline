@@ -1,5 +1,5 @@
 #!/bin/python3.6
-
+#Version QC-data-table-script-V1
 #Script to collate QC-Metrics for analysis to use in building a report
 import sys
 import pandas as pd

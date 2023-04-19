@@ -1,5 +1,6 @@
 #!/bin/python3.6
-
+#Version
+#Freyja_parallelization_V5.1
 #Script for analysis of FASTQ files via Freyja
 import sys
 import time
@@ -156,16 +157,16 @@ if __name__ == "__main__":
 		if args.update:
 			print("Using usher barcode update pulling the most recent usher barcodes" + str(down_date))
 			usherbarcodes = down_date
-			os.system("python3 {0}/usher_update_V4.py {0}".format(workspace_path))
+			os.system("python3 {0}/usher_update.py {0}".format(workspace_path))
 		elif args.date:
 			down_date2 =  "usher_barcodes_{0}.csv".format(args.date)
 			print("Downloading the specified barcodes" + str(down_date2) + "Reminder: Date should be formatted yyyy-mm-dd")
 			usherbarcodes = down_date2
-			os.system("python3 {0}/usher_update_V4.py {0} -d {1}".format(workspace_path, args.date))
+			os.system("python3 {0}/usher_update.py {0} -d {1}".format(workspace_path, args.date))
 		elif not(args.barcode):
 			print("No barcode information provided Downloading most recent barcodes" + str(down_date))
 			usherbarcodes = down_date
-			os.system("python3 {0}/usher_update_V4.py {0}".format(workspace_path))
+			os.system("python3 {0}/usher_update.py {0}".format(workspace_path))
 	if usherbarcodes != down_date:
 			print("Warning: Expected to use usher barcode " + down_date + " To run using the most recent barcode run using --update")
 
@@ -255,5 +256,5 @@ if __name__ == "__main__":
 
 	#Run file checking
 	if (args.file_check):
-		os.system("python3 {0}file_checking_V2.py {0}{1} {2} {3}".format(workspace_path, samples_list_file, output, sample_path))
-		os.system("Rscript {1}file_check_visualize_V1.R {0}File_Check_Output.txt {0}".format(output, workspace_path))
+		os.system("python3 {0}file_checking.py {0}{1} {2} {3}".format(workspace_path, samples_list_file, output, sample_path))
+		os.system("Rscript {1}file_check_visualize.R {0}File_Check_Output.txt {0}".format(output, workspace_path))
