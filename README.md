@@ -136,7 +136,7 @@ The first step is to build the container/
 
 You'll need Singularity Version 3 or greater installed and root permissions
 
-The list of dependencies will be included in Frey
+The list of dependencies will be included in Freyja
 
 ```shell
 
