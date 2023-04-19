@@ -81,11 +81,11 @@ python3 Freyja_parallelization.py Workspace Sample-list
 By default it will use the most up-to-date Usherbarcodes, and run 4 samples at a time with 4 threads per sample.
 This assumes everything not in Workspace directory is in the current directory.
 
-###positional arguments:
+### positional arguments:
   workspace_path        The path to directory where: reference files, databases, sample list, usherbarcodes are.
   samples_list_file     Text file with samples to be run. Used to identify input and output files. The pattern is <sample_name>_R[1-2]_001.fastq.gz
 
-###optional arguments:
+### optional arguments:
   - -h, --help            show this help message and exit
   - -s SAMPLE_PATH, --sample_path SAMPLE_PATH
                         Default: Current working directory.
@@ -107,11 +107,11 @@ After you've run this step you can run the QC_parallelization.py
 python3 QC_parallelization.py Workspace Sample-list
 ```
 
-###positional arguments:
+### positional arguments:
   workspace_path        The path to directory where: reference files, databases, sample list, usherbarcodes are.
   samples_list_file     Text file with samples to be run. Used to identify input and output files. The pattern is <sample_name>_R[1-2]_001.fastq.gz
 
-###optional arguments:
+### optional arguments:
   - -h, --help            show this help message and exit
   - -s SAMPLE_PATH, --sample_path SAMPLE_PATH
                         Default: Current working directory. The location of raw FASTQ files
