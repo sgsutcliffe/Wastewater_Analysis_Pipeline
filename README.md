@@ -37,7 +37,7 @@ Files required:
 
 Files will be downloaded into the working directory if not present when running Freyja_parallelization.py:    
 * Homo_sapiens.GRCh38.fa/.fa.amb/.fa.ann/.fa.bwt/.fa.pac/.fa.sa/ # BWA index for human genome
-   - Note: This step takes a long time. I'd suggest downloading a pre-indexed human genome for bwa. For digital research alliance users you can get it at ```shell /cvmfs/soft.mugqic/CentOS6/genomes/species/Homo_sapiens.GRCh38/genome/bwa_index/ ```
+   - Note: This step takes a long time. I'd suggest downloading a pre-indexed human genome for bwa. For digital research alliance users you can get it at ``` /cvmfs/soft.mugqic/CentOS6/genomes/species/Homo_sapiens.GRCh38/genome/bwa_index/ ```
 * MN908947_3.fasta/.amb/.ann/.bwt/.fai/.pac/.fasta.sa/.gb #BWA index of the reference Wuhan strain Accession: MN908947 
 * SARS-CoV-2.primer.bed #Artic V4.1 primer BED file for iVar primer trimming
 
