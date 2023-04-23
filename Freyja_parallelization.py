@@ -1,6 +1,6 @@
 #!/bin/python3.6
 #Version
-#Freyja_parallelization_V5.1
+#Freyja_parallelization_V5.2
 #Script for analysis of FASTQ files via Freyja
 import sys
 import time
