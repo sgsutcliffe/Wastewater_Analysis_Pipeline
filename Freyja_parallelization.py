@@ -46,7 +46,8 @@ def run_core_iPMVC(wp_path,current_sample, nb_t_profiling, smpl_path, usherbarco
 	os.system("samtools view -bS {0}{1}_preprocessed.sam > {0}{1}_preprocessed.bam && rm {0}{1}_preprocessed.sam".format(output, current_sample))
 	os.system("samtools sort {0}{1}_preprocessed.bam -o {0}{1}_preprocessed_sorted.bam".format(output, current_sample))
 	
-	os.system("ivar trim -i {2}{1}_preprocessed_sorted.bam -b {0}SARS-CoV-2.primer.bed -p {2}{1}_ivartrim".format(wp_path, current_sample,output))
+	os.system("ivar trim -e -m 70 -i {2}{1}_preprocessed_sorted.bam -b {0}SARS-CoV-2.primer.bed -p {2}{1}_ivartrim".format(wp_path, 
+current_sample,output))
 	# Freyja commnad
 	os.system("samtools sort -o {0}{1}_ivartrim_sorted.bam {0}{1}_ivartrim.bam".format(output, current_sample))
 	os.system("samtools index {0}{1}_ivartrim_sorted.bam".format(output, current_sample))
