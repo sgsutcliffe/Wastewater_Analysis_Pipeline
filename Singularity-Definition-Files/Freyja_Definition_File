@@ -80,6 +80,9 @@ From: ubuntu:22.04
 
     mamba install -y -c conda-forge usher=0.6.2
 
+    #pyvcf 0.6.8
+    mamba install -y -c conda-forge pyvcf=0.6.8
+
     #cvxpy 1.2.1
 
     mamba install -y -c conda-forge cvxpy=1.2.1
@@ -123,14 +126,14 @@ From: ubuntu:22.04
     cd MN908947.3
     wget ftp.ebi.ac.uk/ensemblgenomes/pub/viruses/gtf/sars_cov_2/Sars_cov_2.ASM985889v3.101.gtf.gz
     mv Sars_cov_2.ASM985889v3.101.gtf.gz genes.gtf.gz
-    gzip -d genes.gtf.gz
-    sed "s/MN908947.3/ENA|MN908947|MN908947.3/" genes.gtf | gzip > genes.gtf.gz
-    rm genes.gtf
+    #gzip -d genes.gtf.gz
+    #sed "s/MN908947.3/ENA|MN908947|MN908947.3/" genes.gtf | gzip > genes.gtf.gz
+    #rm genes.gtf
     wget http://ftp.ebi.ac.uk/ensemblgenomes/pub/viruses/fasta/sars_cov_2/dna/Sars_cov_2.ASM985889v3.dna.toplevel.fa.gz
     mv Sars_cov_2.ASM985889v3.dna.toplevel.fa.gz MN908947.3.fa.gz
     gzip -d MN908947.3.fa.gz
     #I don't know if header has to match reference FASTA used in alignment but I will make sure it is the same
-    echo '>ENA|MN908947|MN908947.3 Severe acute respiratory syndrome coronavirus 2 isolate Wuhan-Hu-1' > sequences.fa
+    echo '>MN908947.3' > sequences.fa
     cat MN908947.3.fa | tail -n+2 >> sequences.fa
     cd ../..
     java -jar snpEff.jar build -gtf22 -v MN908947.3
