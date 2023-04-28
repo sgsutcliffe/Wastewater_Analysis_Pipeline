@@ -1,5 +1,5 @@
 #!/bin/python3.6
-#Version QC_parallelization_V3
+#Version QC_parallelization_V3.1
 #Script for parrallelization of QC steps on WW analysis
 import sys
 import time
@@ -24,11 +24,16 @@ from argparse import ArgumentParser
 # Cleaned up parameters with argparse
 # Generates a quantative report file (calling QC-data-table.script-V1.py)
 
+#In version 3.1
+# Naming output of already analyzed files option
+# Removes Picard step
+# Updates the input for QC-table script
+
 #time feedback
 start_time = time.time()
 
 #A function that execute the recurring step of this pipeline 
-def run_QC(wp_path, current_sample, nb_t_profiling, smpl_path, output, input_folder, kraken_db):
+def run_QC(wp_path, current_sample, nb_t_profiling, smpl_path, output, input_folder, kraken_db, analyzed_list, insertbed):
 	# #	Step 1: Raw Read Quality via fastqc 0.11.9
 	os.system("fastqc -q --threads {1} {2}{0}_R1_001.fastq.gz {2}{0}_R2_001.fastq.gz --outdir {3}qc_results/".format(current_sample, nb_t_profiling, smpl_path, output))
 	# Generates a fastqc.zip and fastqc.html file per each sequence (forward and reverse)
@@ -53,23 +58,23 @@ def run_QC(wp_path, current_sample, nb_t_profiling, smpl_path, output, input_fol
 	os.system("samtools idxstats {3}{1}_preprocessed_sorted.bam > {0}qc_results/{1}.preiVar.idxstats".format(output, current_sample, nb_t_profiling, input_folder))
 	os.system("samtools stats --threads {2} --ref-seq {3}MN908947_3.fa {4}{1}_preprocessed_sorted.bam > {0}qc_results/{1}.preiVar.stats".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
 	os.system("bedtools coverage -d -a {3}genome.bed -b {4}{1}_preprocessed_sorted.bam > {0}qc_results/{1}.preiVar.depth.bed".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
-	os.system("bedtools coverage -mean -a {3}ArcticV4.1.bed -b {4}{1}_preprocessed_sorted.bam > {0}qc_results/{1}.preiVar.amplicon.depth.bed".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
+	os.system("bedtools coverage -mean -a {3}{5} -b {4}{1}_preprocessed_sorted.bam > {0}qc_results/{1}.preiVar.amplicon.depth.bed".format(output, current_sample, nb_t_profiling, wp_path, input_folder,insertbed))
 	os.system("bedtools coverage -mean -a {3}SARS-CoV-2_ORF_full.bed -b {4}{1}_preprocessed_sorted.bam > {0}qc_results/{1}.preiVar.ORF.depth.bed".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
-	os.system("picard -Xmx5g CollectMultipleMetrics --INPUT {4}{1}_preprocessed_sorted.bam --OUTPUT {0}qc_results/{1}.preiVar.CollectMultipleMetrics --REFERENCE_SEQUENCE {3}MN908947_3.fa".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
+	#os.system("picard -Xmx5g CollectMultipleMetrics --INPUT {4}{1}_preprocessed_sorted.bam --OUTPUT {0}qc_results/{1}.preiVar.CollectMultipleMetrics --REFERENCE_SEQUENCE {3}MN908947_3.fa".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
 	#	Step4b: Alingment-level QC on alignment of human decontaminated reads to reference genome (postiVar)
 	os.system("samtools flagstat --threads {2} {3}{1}_ivartrim_sorted.bam > {0}qc_results/{1}.postiVar.flagstat".format(output, current_sample, nb_t_profiling, input_folder))
 	os.system("samtools idxstats {3}{1}_ivartrim_sorted.bam > {0}qc_results/{1}.postiVar.idxstats".format(output, current_sample, nb_t_profiling, input_folder))
 	os.system("samtools stats --threads {2} --ref-seq {3}MN908947_3.fa {4}{1}_ivartrim_sorted.bam > {0}qc_results/{1}.postiVar.stats".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
 	os.system("bedtools coverage -d -a {3}genome.bed -b {4}{1}_ivartrim_sorted.bam > {0}qc_results/{1}.postiVar.depth.bed".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
-	os.system("bedtools coverage -mean -a {3}ArcticV4.1.bed -b {4}{1}_ivartrim_sorted.bam > {0}qc_results/{1}.postiVar.amplicon.depth.bed".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
+	os.system("bedtools coverage -mean -a {3}{5} -b {4}{1}_ivartrim_sorted.bam > {0}qc_results/{1}.postiVar.amplicon.depth.bed".format(output, current_sample, nb_t_profiling, wp_path, input_folder,insertbed))
 	os.system("bedtools coverage -mean -a {3}SARS-CoV-2_ORF_full.bed -b {4}{1}_ivartrim_sorted.bam > {0}qc_results/{1}.postiVar.ORF.depth.bed".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
-	os.system("picard -Xmx5g CollectMultipleMetrics --INPUT {4}{1}_ivartrim_sorted.bam --OUTPUT {0}qc_results/{1}.postiVar.CollectMultipleMetrics --REFERENCE_SEQUENCE {3}MN908947_3.fa".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
+	#os.system("picard -Xmx5g CollectMultipleMetrics --INPUT {4}{1}_ivartrim_sorted.bam --OUTPUT {0}qc_results/{1}.postiVar.CollectMultipleMetrics --REFERENCE_SEQUENCE {3}MN908947_3.fa".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
 	#Removed picard as it breaks MultiQC by making it too large!
 	if (args.single):
 		os.system("multiqc {0}qc_results/{1}* -o {0}qc_results/{1}_multiqc_data".format(output, current_sample))
 	#	Final Step: check for completion
-	print("echo {1} >> {0}QC_analyzed_samples.txt".format(wp_path, current_sample))
-	os.system("echo {1} >> {0}QC_analyzed_samples.txt".format(wp_path, current_sample))  
+	print("echo {1} >> {0}{2}".format(wp_path, current_sample, analyzed_list))
+	os.system("echo {1} >> {0}{2}".format(wp_path, current_sample, analyzed_list))  
 
 #create a function that test if a string is numeric
 def is_numeric(the_str):
@@ -104,8 +109,10 @@ if __name__ == "__main__":
 			 #help = "Only for Digital Alliance Users: Use the mugqic kraken2 database version of files") #Optional
 	parser.add_argument("-x", "--single", action="store_true",
 			 help = "When you have too many files for one MultiQC report run each seperately") #Optional
-	
-
+	parser.add_argument("-a", "--analyzed", default="QC_analyzed_samples.txt",
+			 help = "Output file for listing samples that have been completed") #Optional
+	parser.add_argument("-V", "--arctic", default = "V4.1",
+		     help = "Specify the Arctic primer scheme used: V1, V2, V3, V4, V4.1") #Optional
 	args = parser.parse_args()
 
 	#### ARGUMENTS && MISC FILE CHECKING ####
@@ -193,6 +200,11 @@ if __name__ == "__main__":
 		if not os.path.exists("{0}".format(kraken_db)):
 			print("The default Kraken database has not been built/found:" + kraken_db + "If running analysis on Digital Alliance server try the mugqic option")
 			raise SystemExit(1)
+	
+	#Making that Artic insert bed file is downloaded
+	if not os.path.exists("{0}SARS-CoV-2.{1}.insert.bed".format(workspace_path, args.arctic)):
+		os.system("wget -O {0}SARS-CoV-2.{1}.insert.bed https://raw.githubusercontent.com/artic-network/primer-schemes/master/nCoV-2019/{1}}/SARS-CoV-2.insert.bed".format(workspace_path, args.arctic))
+	insertbed = "{0}SARS-CoV-2.{1}.insert.bed".format(workspace_path, args.arctic)
 
 	#Number of samples being analysed in parallel (Default 4 samples at a time)
 	nb_sim_process = int(args.parallel)
@@ -203,7 +215,8 @@ if __name__ == "__main__":
 	print('Using ' + str(threads) + 'threads per ' + str(nb_sim_process) + ' samples analyzed simultaneously')
 	
 	#Ceate file that records samples that have already been analyzed for QC
-	os.system("/bin/touch {0}QC_analyzed_samples.txt".format(workspace_path))
+	analyzed_list=args.analyzed
+	os.system("/bin/touch {0}{1}".format(workspace_path, analyzed_list))
 
 	print("File checking complete, running analysis")
 
@@ -213,7 +226,7 @@ if __name__ == "__main__":
 	for i in liste_index_sample:
 		# create a list that will record the samples that have already been analysed
 		already_analysed_samples_list=[]
-		with open("{0}QC_analyzed_samples.txt".format(workspace_path)) as f:
+		with open("{0}{1}".format(workspace_path, analyzed_list)) as f:
 			already_analyzed_samples_list = f.readlines()
 		index_line = 0
 		for line in already_analyzed_samples_list:
@@ -226,21 +239,21 @@ if __name__ == "__main__":
 			for t in sub_list_index:
 				if (not(lst_samples[t] in already_analyzed_samples_list)):
 					print("Starting QC-analysis on sample : " + lst_samples[t])
-					globals()["p"+str(t)] = mp.Process(target=run_QC, args=(workspace_path, lst_samples[t], threads, sample_path, output, input_folder, kraken_db,))
+					globals()["p"+str(t)] = mp.Process(target=run_QC, args=(workspace_path, lst_samples[t], threads, sample_path, output, input_folder, kraken_db, analyzed_list, insertbed,))
 					processes.append(globals()["p"+str(t)])
 					globals()["p"+str(t)].start()
 				else:
-					print(lst_samples[t] + "has already been analyzed, if re-analyzing, remove from QC_analyzed_samples.txt")
+					print(lst_samples[t] + "has already been analyzed, if re-analyzing, remove from " + analyzed_list)
 		else:
 			sub_list_index = range(i,num_samples,1)
 			for t in sub_list_index:
 				if (not(lst_samples[t] in already_analyzed_samples_list)):
 					print("Starting QC-analysis on sample : " + lst_samples[t])
-					globals()["p"+str(t)] = mp.Process(target=run_QC, args=(workspace_path, lst_samples[t], threads, sample_path, output, input_folder, kraken_db,))
+					globals()["p"+str(t)] = mp.Process(target=run_QC, args=(workspace_path, lst_samples[t], threads, sample_path, output, input_folder, kraken_db,analyzed_list, insertbed))
 					processes.append(globals()["p"+str(t)])
 					globals()["p"+str(t)].start()
 				else:
-					print(lst_samples[t] + "has already been analyzed, if re-analyzing, remove from QC_analyzed_samples.txt")
+					print(lst_samples[t] + "has already been analyzed, if re-analyzing, remove from " + analyzed_list)
 		if (len(processes) != 0):
 			for p in processes:
 				p.join()
@@ -253,6 +266,6 @@ if __name__ == "__main__":
 		os.system("multiqc {0}qc_results/ -o {0}qc_results/multiqc_data".format(output))
 
 	#Step 7: Generate a quantative report
-	os.system("python3 {0}QC-data-table-script.py {0} {1} {2} {3}qc_results/ {3}qc_results/".format(workspace_path, input_folder, samples_list_file, output))
+	os.system("python3 {0}QC-data-table-script.py {0} {1} {2} {3}qc_results/ {3}qc_results/ {4}".format(workspace_path, input_folder, samples_list_file, output, insertbed))
 	
 	
