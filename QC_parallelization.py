@@ -203,7 +203,7 @@ if __name__ == "__main__":
 	
 	#Making that Artic insert bed file is downloaded
 	if not os.path.exists("{0}SARS-CoV-2.{1}.insert.bed".format(workspace_path, args.arctic)):
-		os.system("wget -O {0}SARS-CoV-2.{1}.insert.bed https://raw.githubusercontent.com/artic-network/primer-schemes/master/nCoV-2019/{1}}/SARS-CoV-2.insert.bed".format(workspace_path, args.arctic))
+		os.system("wget -O {0}SARS-CoV-2.{1}.insert.bed https://raw.githubusercontent.com/artic-network/primer-schemes/master/nCoV-2019/{1}/SARS-CoV-2.insert.bed".format(workspace_path, args.arctic))
 	insertbed = "{0}SARS-CoV-2.{1}.insert.bed".format(workspace_path, args.arctic)
 
 	#Number of samples being analysed in parallel (Default 4 samples at a time)
