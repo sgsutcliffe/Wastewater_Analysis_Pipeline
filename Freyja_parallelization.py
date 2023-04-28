@@ -45,9 +45,9 @@ def run_core_iPMVC(wp_path,current_sample, nb_t_profiling, smpl_path, usherbarco
 	
 	os.system("samtools view -bS {0}{1}_preprocessed.sam > {0}{1}_preprocessed.bam && rm {0}{1}_preprocessed.sam".format(output, current_sample))
 	os.system("samtools sort {0}{1}_preprocessed.bam -o {0}{1}_preprocessed_sorted.bam".format(output, current_sample))
-	
-	os.system("ivar trim -e -m 70 -i {2}{1}_preprocessed_sorted.bam -b {0}SARS-CoV-2.primer.bed -p {2}{1}_ivartrim".format(wp_path, 
-current_sample,output))
+	#In this version I am making a big change with -m option and setting minimum length to 70
+	#We also now include reads with no primers due to Nextera library prep
+	os.system("ivar trim -e -m 70 -i {2}{1}_preprocessed_sorted.bam -b {0}{3} -p {2}{1}_ivartrim".format(wp_path, current_sample,output, primerbed))
 	# Freyja commnad
 	os.system("samtools sort -o {0}{1}_ivartrim_sorted.bam {0}{1}_ivartrim.bam".format(output, current_sample))
 	os.system("samtools index {0}{1}_ivartrim_sorted.bam".format(output, current_sample))
@@ -63,8 +63,8 @@ current_sample,output))
 
 	if os.path.exists("{1}results/{0}_output".format(current_sample,output)):
 		#glob.glob("date | date '+%F' >> {1}results/{0}_output".format(current_sample, output))
-		print("echo {1} >> {0}Already_analyzed_samples.txt".format(wp_path, current_sample))
-		os.system("echo {1} >> {0}Already_analyzed_samples.txt".format(wp_path, current_sample))  
+		print("echo {1} >> {0}{2}".format(wp_path, current_sample,analyzed_list))
+		os.system("echo {1} >> {0}{2}".format(wp_path, current_sample, analyzed_list))  
 
 #create a function that test if a string is numeric
 def is_numeric(the_str):
@@ -99,6 +99,10 @@ if __name__ == "__main__":
 		     help = "Option generates a file checking file/figure to confirm if everything was created") #Optional
 	parser.add_argument("-d", "--date",
 		     help = "If you want to download a specific usher barcode date. Put date in yyyy-mm-dd") #Optional
+	parser.add_argument("-V", "--arctic", default = "V4.1",
+		     help = "Specify the Arctic primer scheme used: V1, V2, V3, V4, V4.1") #Optional
+	parser.add_argument("-a", "--analyzed", default="QC_analyzed_samples.txt",
+			 help = "Output file for listing samples that have been completed") #Optional
 	args = parser.parse_args()
 
 	#### ARGUMENTS && MISC FILE CHECKING ####
@@ -188,22 +192,28 @@ if __name__ == "__main__":
 
 	#Making sure that Human refrence genome BWA index is downloaded
 	if not os.path.exists("{0}Homo_sapiens.GRCh38.fa.bwt".format(workspace_path)):
+		print("Downloading reference Human genome and building index. Will take a long-time. I suggest downloading precompiled version")
 		os.system("wget --quiet -O {0}Homo_sapiens.GRCh38.dna.alt.fa.gz http://ftp.ensembl.org/pub/release-107/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.alt.fa.gz".format(workspace_path))
 		os.system("gzip -d {0}Homo_sapiens.GRCh38.dna.alt.fa.gz".format(workspace_path))
 		os.system("mv {0}Homo_sapiens.GRCh38.dna.alt.fa {0}Homo_sapiens.GRCh38.fa".format(workspace_path))
-		os.system("bwa index -p {0}Homo_sapiens.GRCh38.fa {0}Homo_sapiens.GRCh38.fa".format(workspace_path))
+		os.system("bwa index -a bwtsw -p {0}Homo_sapiens.GRCh38.fa {0}Homo_sapiens.GRCh38.fa".format(workspace_path))
 
 	#Making sure that Wuhan reference SARS genome BWA index is downloaded
+	#This version changes reference fasta to one on arctic network and changes chromosome name
 	if not os.path.exists("{0}MN908947_3.fa.bwt".format(workspace_path)):
-		os.system("wget --quiet -O {0}MN908947_3.fa https://www.ebi.ac.uk/ena/browser/api/fasta/MN908947.3?download=true".format(workspace_path))
+		os.system("wget --quiet -O {0}MN908947_3.fa https://raw.githubusercontent.com/artic-network/primer-schemes/master/nCoV-2019/V4.1/SARS-CoV-2.reference.fasta".format(workspace_path))
 		os.system("bwa index -p {0}MN908947_3.fa {0}MN908947_3.fa".format(workspace_path))
 	
-	#Making that Artic V4.1 bed file is downloaded
-	if not os.path.exists("{0}SARS-CoV-2.primer.bed".format(workspace_path)):
-		os.system("wget -O {0}SARS-CoV-2.primer.bed https://raw.githubusercontent.com/artic-network/primer-schemes/master/nCoV-2019/V4.1/SARS-CoV-2.primer.bed".format(workspace_path))
-
-	#Create file that records samples that have already been analyzed
-	os.system("/bin/touch {0}Already_analyzed_samples.txt".format(workspace_path))
+	#Making that Artic primer bed file is downloaded
+	if not os.path.exists("{0}SARS-CoV-2.{1}.primer.bed".format(workspace_path, args.arctic)):
+		print("Downloading {0} primer-scheme".format(args.arctic))
+		os.system("wget -O {0}SARS-CoV-2.{1}.primer.bed https://raw.githubusercontent.com/artic-network/primer-schemes/master/nCoV-2019/{1}}/SARS-CoV-2.primer.bed".format(workspace_path, args.arctic))
+	print("Using {0} primer-scheme".format(args.arctic))
+	primerbed = "{0}SARS-CoV-2.{1}.primer.bed".format(workspace_path, args.arctic)
+	
+	#Ceate file that records samples that have already been analyzed for QC
+	analyzed_list=args.analyzed
+	os.system("/bin/touch {0}{1}".format(workspace_path, analyzed_list))
 	
 	#Number of samples being analysed in parallel (Default 4 samples at a time)
 	nb_sim_process = int(args.parallel)
@@ -220,7 +230,7 @@ if __name__ == "__main__":
 	for i in liste_index_sample:
 		# create a list that will record the samples that have already been analysed
 		already_analysed_samples_list=[]
-		with open("{0}Already_analyzed_samples.txt".format(workspace_path)) as f:
+		with open("{0}{1}".format(workspace_path, analyzed_list)) as f:
 			already_analyzed_samples_list = f.readlines()
 		index_line = 0
 		for line in already_analyzed_samples_list:
@@ -233,21 +243,21 @@ if __name__ == "__main__":
 			for t in sub_list_index:
 				if (not(lst_samples[t] in already_analyzed_samples_list)):
 					print("Starting analysis on sample : " + lst_samples[t])
-					globals()["p"+str(t)] = mp.Process(target=run_core_iPMVC, args=(workspace_path, lst_samples[t], threads,sample_path,usherbarcodes, output,))
+					globals()["p"+str(t)] = mp.Process(target=run_core_iPMVC, args=(workspace_path, lst_samples[t], threads,sample_path,usherbarcodes, output, analyzed_list, primerbed))
 					processes.append(globals()["p"+str(t)])
 					globals()["p"+str(t)].start()
 				else:
-					print(lst_samples[t] + "has already been analyzed, if re-analyzing, remove from Already_analyzed_samples.txt")
+					print(lst_samples[t] + "has already been analyzed, if re-analyzing, remove from " + analyzed_list)
 		else:
 			sub_list_index = range(i,num_samples,1)
 			for t in sub_list_index:
 				if (not(lst_samples[t] in already_analyzed_samples_list)):
 					print("Starting analysis on sample : " + lst_samples[t])
-					globals()["p"+str(t)] = mp.Process(target=run_core_iPMVC, args=(workspace_path, lst_samples[t], threads,sample_path,usherbarcodes, output,))
+					globals()["p"+str(t)] = mp.Process(target=run_core_iPMVC, args=(workspace_path, lst_samples[t], threads,sample_path,usherbarcodes, output, analyzed_list, primerbed))
 					processes.append(globals()["p"+str(t)])
 					globals()["p"+str(t)].start()
 				else:
-					print(lst_samples[t] + "has already been analyzed, if re-analyzing, remove from Already_analyzed_samples.txt")
+					print(lst_samples[t] + "has already been analyzed, if re-analyzing, remove from " + analyzed_list)
 		if (len(processes) != 0):
 			for p in processes:
 				p.join()
