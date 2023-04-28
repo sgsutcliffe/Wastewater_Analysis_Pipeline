@@ -4,7 +4,7 @@ A pipeline for SARS-CoV-2 analysis on wastewater samples. Created specifically f
 
 You can install all the software required (below) to run the pipeline, which is a lot, or build the singularity container to run everything.
 
-## Note: 
+## Note:
 Pipeline was developed for short-paired end sequences (150bp) based on tile-amplicon sequencing with Arctic V4.1 primers. Library preparation was done with Nextera kits. We make some assumptions. 1) You want to keep reads without primers detected (iVar) due to library preparation. 2) It is hardcoded in to use Arctic V4.1 primer scheme. This makes the pipeline not functional for everyone. I will address these in future updates.
 
 Dependencies (versions listed have been tested):
