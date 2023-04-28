@@ -101,7 +101,7 @@ if __name__ == "__main__":
 		     help = "If you want to download a specific usher barcode date. Put date in yyyy-mm-dd") #Optional
 	parser.add_argument("-V", "--arctic", default = "V4.1",
 		     help = "Specify the Arctic primer scheme used: V1, V2, V3, V4, V4.1") #Optional
-	parser.add_argument("-a", "--analyzed", default="QC_analyzed_samples.txt",
+	parser.add_argument("-a", "--analyzed", default="Analyzed_samples.txt",
 			 help = "Output file for listing samples that have been completed") #Optional
 	args = parser.parse_args()
 
