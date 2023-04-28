@@ -49,6 +49,9 @@ if __name__ == "__main__":
 		script_output = "{0}/".format(script_output)
 	print("Files from this script will be located at : '{0}'".format(script_output))
 
+	#6 Arctic insert bed
+	insertbed =sys.argv[6]
+
 	#Now loop through every sample and perform the collection of QC-data for the ten categories
 	data = pd.read_csv(samples_list_file, header = None, sep='\t')
 
@@ -77,6 +80,11 @@ if __name__ == "__main__":
 	num_sig_mutations = []
 	# Step 12: Mean Depth of All Signficant mutations
 	avg_depth_mutations = []
+	# Step 13: Mean Depth of spike protein
+	spike_depth = []
+	# Step 14: Breadth of spike coverage
+	spike_breadth = []
+
 
 	for index, row in data.iterrows():
 		sample = row[0]
@@ -102,19 +110,23 @@ if __name__ == "__main__":
 			perc_human.append("NA")
 			perc_sars.append("NA")
 		if glob.glob("{0}{1}_ivartrim_sorted.bam".format(analysis_input, sample)):
-			genome_breadth.append(subprocess.getoutput("bedtools coverage -a {0}MN908947.3.bed -b {1}{2}_ivartrim_sorted.bam | cut -f7 ".format(ref_path, analysis_input, sample)))
-			genome_depth.append(subprocess.getoutput("bedtools coverage -mean -a {0}MN908947.3.bed -b {1}{2}_ivartrim_sorted.bam | cut -f4 ".format(ref_path, analysis_input, sample)))
-			step7_cmd = "bedtools coverage -mean -a " + ref_path + "ArcticV4.1.bed -b " + analysis_input + sample + "_ivartrim_sorted.bam | awk '{ sum += $5 } END { print sum /103}'"
+			genome_breadth.append(subprocess.getoutput("bedtools coverage -a {0}genome.bed -b {1}{2}_ivartrim_sorted.bam | cut -f7 ".format(ref_path, analysis_input, sample)))
+			genome_depth.append(subprocess.getoutput("bedtools coverage -mean -a {0}genome.bed -b {1}{2}_ivartrim_sorted.bam | cut -f4 ".format(ref_path, analysis_input, sample)))
+			step7_cmd = "bedtools coverage -mean -a " + ref_path + insertbed + " -b " + analysis_input + sample + "_ivartrim_sorted.bam | awk '{ sum += $5 } END { print sum /103}'"
 			amplicon_depth.append(float(subprocess.getoutput(step7_cmd).strip()))
-			step8_cmd = "bedtools coverage -mean -a " + ref_path + "ArcticV4.1.bed -b " + analysis_input + sample + "_ivartrim_sorted.bam | awk '($5>= 100) {++n} END {print n+0}'"
+			step8_cmd = "bedtools coverage -mean -a " + ref_path + insertbed + " -b " + analysis_input + sample + "_ivartrim_sorted.bam | awk '($5>= 100) {++n} END {print n+0}'"
 			amplicon_100xdepth.append(float(subprocess.getoutput(step8_cmd).strip()))
 			step9_cmd = "bedtools coverage -mean -a " + ref_path + "SARS-CoV-2_ORF_full.bed -b " + analysis_input + sample + "_ivartrim_sorted.bam | awk '{ sum += $5 } END { print sum /16}'"
 			ORF_depth.append(float(subprocess.getoutput(step9_cmd).strip()))
 			step10_cmd = "bedtools coverage -mean -a " + ref_path + "SARS-CoV-2_ORF_full.bed -b " + analysis_input + sample + "_ivartrim_sorted.bam | awk '($5>= 100) {++n} END {print n+0}'"
 			ORF_100xdepth.append(float(subprocess.getoutput(step10_cmd).strip()))
+			spike_breadth.append(subprocess.getoutput("bedtools coverage -a {0}spike.bed -b {1}{2}_ivartrim_sorted.bam | cut -f7 ".format(ref_path, analysis_input, sample)))
+			spike_depth .append(subprocess.getoutput("bedtools coverage -mean -a {0}spike.bed -b {1}{2}_ivartrim_sorted.bam | cut -f4 ".format(ref_path, analysis_input, sample)))
 		else:
 			genome_breadth.append("NA")
 			genome_depth.append("NA")
+			spike_breadth.append("NA")
+			spike_depth.append("NA")
 			amplicon_depth.append("NA")
 			amplicon_100xdepth.append("NA")
 			ORF_100xdepth.append("NA")
@@ -139,6 +151,8 @@ if __name__ == "__main__":
 	data['Number of Amplicons mean depth >=100x'] = amplicon_100xdepth
 	data['Mean depth (ORFs)'] = ORF_depth 
 	data['Number of ORFs mean depth >=100x'] = ORF_100xdepth
+	data['Breadth of coverage (Spike)'] = spike_breadth
+	data['Mean depth (Spike)'] = spike_depth
 	data['Number of signficant SNVs'] = num_sig_mutations
 	data['Mean depth of all significant mutations'] = avg_depth_mutations
 	output_file_name = script_output + 'QC-Summary-Report.tsv'
