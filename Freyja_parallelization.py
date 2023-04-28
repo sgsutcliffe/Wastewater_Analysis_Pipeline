@@ -207,7 +207,7 @@ if __name__ == "__main__":
 	#Making that Artic primer bed file is downloaded
 	if not os.path.exists("{0}SARS-CoV-2.{1}.primer.bed".format(workspace_path, args.arctic)):
 		print("Downloading {0} primer-scheme".format(args.arctic))
-		os.system("wget -O {0}SARS-CoV-2.{1}.primer.bed https://raw.githubusercontent.com/artic-network/primer-schemes/master/nCoV-2019/{1}}/SARS-CoV-2.primer.bed".format(workspace_path, args.arctic))
+		os.system("wget -O {0}SARS-CoV-2.{1}.primer.bed https://raw.githubusercontent.com/artic-network/primer-schemes/master/nCoV-2019/{1}/SARS-CoV-2.primer.bed".format(workspace_path, args.arctic))
 	print("Using {0} primer-scheme".format(args.arctic))
 	primerbed = "{0}SARS-CoV-2.{1}.primer.bed".format(workspace_path, args.arctic)
 	
