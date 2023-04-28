@@ -5,7 +5,7 @@ A pipeline for SARS-CoV-2 analysis on wastewater samples. Created specifically f
 You can install all the software required (below) to run the pipeline, which is a lot, or build the singularity container to run everything.
 
 ## Note:
-Pipeline was developed for short-paired end sequences (150bp) based on tile-amplicon sequencing with Arctic V4.1 primers. Library preparation was done with Nextera kits. We make some assumptions. 1) You want to keep reads without primers detected (iVar) due to library preparation. 2) It is hardcoded in to use Arctic V4.1 primer scheme. This makes the pipeline not functional for everyone. I will address these in future updates.
+Pipeline was developed for short-paired end sequences (150bp) based on tile-amplicon sequencing with Arctic V4.1 primers. Library preparation was done with Nextera kits. We make some assumptions. 1) You want to keep reads without primers detected (iVar) due to Nextera library preparation.
 
 Dependencies (versions listed have been tested):
 - Python 3 (tested on 3.9.12)
@@ -42,7 +42,8 @@ Files will be downloaded into the working directory if not present when running 
 * Homo_sapiens.GRCh38.fa/.fa.amb/.fa.ann/.fa.bwt/.fa.pac/.fa.sa/ # BWA index for human genome
    - Note: This step takes a long time. I'd suggest downloading a pre-indexed human genome for bwa. For digital research alliance users you can get it at ``` /cvmfs/soft.mugqic/CentOS6/genomes/species/Homo_sapiens.GRCh38/genome/bwa_index/ ```
 * MN908947_3.fasta/.amb/.ann/.bwt/.fai/.pac/.fasta.sa/.gb #BWA index of the reference Wuhan strain Accession: MN908947 
-* SARS-CoV-2.primer.bed #Artic V4.1 primer BED file for iVar primer trimming
+* SARS-CoV-2.primer.bed #Arctic primer BED file for iVar primer trimming
+* SARS-CoV-2.insert.bed #Arctic inserts BED file used for coverage analysis with bedtools
 
 To build yourself:
 * Kraken2 database built with contaminants the user wants to look for. Instructions below (needs a minimum SARS-CoV-2 and Human Genome)
@@ -55,13 +56,13 @@ kraken2-build --standard --threads 24  --db /path/to/run/location/Kraken2wViruse
 ```
 Note: This will build the entire Kraken2 database which is quite large and require a lot of memory to build (~100GB). For instructions on customizing the build and speeding up the process using multiple-threads see https://github.com/DerrickWood/kraken2/wiki/Manual I would recommend including all viruses and human-genome in the build at the very least.
 
-I don't know if it is my build or server but I could not get a build to work. I instead used one from here:
+Or download a pre-built Kraken2 database (just make sure to get one with viruses and human genome at least):
 https://benlangmead.github.io/aws-indexes/k2
 For my analysis it was https://genome-idx.s3.amazonaws.com/kraken/k2_standard_20230314.tar.gz 
 
 ### Recipe for making sample list
 
-The paired reads that come from C3G have the extensions and right now the pipeline expects this:
+The paired reads that come from my sequencer have this extensions and right now the pipeline expects this:
 R1 = <sample_name>_R1_001.fastq.gz
 R2 = <sample_name>_R2_001.fastq.gz
 
@@ -104,7 +105,9 @@ This assumes everything not in Workspace directory is in the current directory.
                         Default: 4 Number of samples run in parallel.
   - -f, --file_check      Option generates a file checking file/figure to confirm if everything was created
   - -d DATE, --date DATE  If you want to download a specific usher barcode date. Put date in yyyy-mm-dd
-
+  - -V --arctic Specify the Arctic primer scheme used: V1, V2, V3, V4, V4.1 Default: V4.1
+  - -a --analyzed Output file for listing samples that have been completed default="Analyzed_samples.txt
+  
 After you've run this step you can run the QC_parallelization.py
 
 ```shell
@@ -130,7 +133,8 @@ python3 QC_parallelization.py Workspace Sample-list
   - -k KRAKEN, --kraken KRAKEN
                         Default: Kraken2wViruses, Directory of Kraken database. If running on Digital Alliance servers see option -mugqic
   - -x, --single          When you have too many files for one MultiQC report run each seperately
-
+  - -V --arctic Specify the Arctic primer scheme used: V1, V2, V3, V4, V4.1 Default: V4.1
+  - -a --analyzed Output file for listing samples that have been completed default="Analyzed_samples.txt
 
 ## Running Freyja using the singularity container
 
