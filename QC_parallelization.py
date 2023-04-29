@@ -58,7 +58,7 @@ def run_QC(wp_path, current_sample, nb_t_profiling, smpl_path, output, input_fol
 	os.system("samtools idxstats {3}{1}_preprocessed_sorted.bam > {0}qc_results/{1}.preiVar.idxstats".format(output, current_sample, nb_t_profiling, input_folder))
 	os.system("samtools stats --threads {2} --ref-seq {3}MN908947_3.fa {4}{1}_preprocessed_sorted.bam > {0}qc_results/{1}.preiVar.stats".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
 	os.system("bedtools coverage -d -a {3}genome.bed -b {4}{1}_preprocessed_sorted.bam > {0}qc_results/{1}.preiVar.depth.bed".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
-	os.system("bedtools coverage -mean -a {5} -b {4}{1}_preprocessed_sorted.bam > {0}qc_results/{1}.preiVar.amplicon.depth.bed".format(output, current_sample, nb_t_profiling, wp_path, input_folder,insertbed))
+	os.system("bedtools coverage -mean -a {3}{5} -b {4}{1}_preprocessed_sorted.bam > {0}qc_results/{1}.preiVar.amplicon.depth.bed".format(output, current_sample, nb_t_profiling, wp_path, input_folder,insertbed))
 	os.system("bedtools coverage -mean -a {3}SARS-CoV-2_ORF_full.bed -b {4}{1}_preprocessed_sorted.bam > {0}qc_results/{1}.preiVar.ORF.depth.bed".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
 	#os.system("picard -Xmx5g CollectMultipleMetrics --INPUT {4}{1}_preprocessed_sorted.bam --OUTPUT {0}qc_results/{1}.preiVar.CollectMultipleMetrics --REFERENCE_SEQUENCE {3}MN908947_3.fa".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
 	#	Step4b: Alingment-level QC on alignment of human decontaminated reads to reference genome (postiVar)
@@ -66,7 +66,7 @@ def run_QC(wp_path, current_sample, nb_t_profiling, smpl_path, output, input_fol
 	os.system("samtools idxstats {3}{1}_ivartrim_sorted.bam > {0}qc_results/{1}.postiVar.idxstats".format(output, current_sample, nb_t_profiling, input_folder))
 	os.system("samtools stats --threads {2} --ref-seq {3}MN908947_3.fa {4}{1}_ivartrim_sorted.bam > {0}qc_results/{1}.postiVar.stats".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
 	os.system("bedtools coverage -d -a {3}genome.bed -b {4}{1}_ivartrim_sorted.bam > {0}qc_results/{1}.postiVar.depth.bed".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
-	os.system("bedtools coverage -mean -a {5} -b {4}{1}_ivartrim_sorted.bam > {0}qc_results/{1}.postiVar.amplicon.depth.bed".format(output, current_sample, nb_t_profiling, wp_path, input_folder,insertbed))
+	os.system("bedtools coverage -mean -a {3}{5} -b {4}{1}_ivartrim_sorted.bam > {0}qc_results/{1}.postiVar.amplicon.depth.bed".format(output, current_sample, nb_t_profiling, wp_path, input_folder,insertbed))
 	os.system("bedtools coverage -mean -a {3}SARS-CoV-2_ORF_full.bed -b {4}{1}_ivartrim_sorted.bam > {0}qc_results/{1}.postiVar.ORF.depth.bed".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
 	#os.system("picard -Xmx5g CollectMultipleMetrics --INPUT {4}{1}_ivartrim_sorted.bam --OUTPUT {0}qc_results/{1}.postiVar.CollectMultipleMetrics --REFERENCE_SEQUENCE {3}MN908947_3.fa".format(output, current_sample, nb_t_profiling, wp_path, input_folder))
 	#Removed picard as it breaks MultiQC by making it too large!
@@ -204,7 +204,7 @@ if __name__ == "__main__":
 	#Making that Artic insert bed file is downloaded
 	if not os.path.exists("{0}SARS-CoV-2.{1}.insert.bed".format(workspace_path, args.arctic)):
 		os.system("wget -O {0}SARS-CoV-2.{1}.insert.bed https://raw.githubusercontent.com/artic-network/primer-schemes/master/nCoV-2019/{1}/SARS-CoV-2.insert.bed".format(workspace_path, args.arctic))
-	insertbed = "{0}SARS-CoV-2.{1}.insert.bed".format(workspace_path, args.arctic)
+	insertbed = "SARS-CoV-2.{0}.insert.bed".format(args.arctic)
 
 	#Number of samples being analysed in parallel (Default 4 samples at a time)
 	nb_sim_process = int(args.parallel)
