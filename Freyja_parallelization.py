@@ -26,7 +26,7 @@ from argparse import ArgumentParser
 start_time = time.time()
 
 #A function that execute the recurring step of this pipeline 
-def run_core_iPMVC(wp_path,current_sample, nb_t_profiling, smpl_path, usherbarcodes, output):
+def run_core_iPMVC(wp_path,current_sample, nb_t_profiling, smpl_path, usherbarcodes, output, analyzed_list, primerbed):
 	# Quality Control: trimming, automatic adapters removal and low complexity reads removal
 	os.system("fastp -i {2}{0}_R1_001.fastq.gz -I {2}{0}_R2_001.fastq.gz -o {3}{0}_R1_001_trimmed_1.fastq.gz -O {3}{0}_R2_001_trimmed_2.fastq.gz -l 70 -x --cut_tail --cut_tail_mean_quality 20 --detect_adapter_for_pe --thread {1} --json {3}{0}.fastp.json".format(current_sample, nb_t_profiling, smpl_path, output))
 	
@@ -47,7 +47,7 @@ def run_core_iPMVC(wp_path,current_sample, nb_t_profiling, smpl_path, usherbarco
 	os.system("samtools sort {0}{1}_preprocessed.bam -o {0}{1}_preprocessed_sorted.bam".format(output, current_sample))
 	#In this version I am making a big change with -m option and setting minimum length to 70
 	#We also now include reads with no primers due to Nextera library prep
-	os.system("ivar trim -e -m 70 -i {2}{1}_preprocessed_sorted.bam -b {0}{3} -p {2}{1}_ivartrim".format(wp_path, current_sample,output, primerbed))
+	os.system("ivar trim -e -m 70 -i {2}{1}_preprocessed_sorted.bam -b {3} -p {2}{1}_ivartrim".format(wp_path, current_sample,output, primerbed))
 	# Freyja commnad
 	os.system("samtools sort -o {0}{1}_ivartrim_sorted.bam {0}{1}_ivartrim.bam".format(output, current_sample))
 	os.system("samtools index {0}{1}_ivartrim_sorted.bam".format(output, current_sample))
