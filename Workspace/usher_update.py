@@ -28,7 +28,7 @@ def convert_tree(locDir, date):
 
 
 def get_curated_lineage_data(locDir, date):
-	os.system("wget -O {0}/curated_lineages.json https://raw.githubusercontent.com/outbreak-info/outbreak.info/master/web/src/assets/genomics/curated_lineages.json".format(locDir))
+	os.system("wget -O {0}/curated_lineages{1}.json https://raw.githubusercontent.com/outbreak-info/outbreak.info/master/web/src/assets/genomics/curated_lineages.json".format(locDir, date))
 	#url2 = "https://raw.githubusercontent.com/outbreak-info/outbreak.info/"\
 		   #"master/web/src/assets/genomics/curated_lineages.json"
 	#urllib.request.urlretrieve(url2,
@@ -40,7 +40,7 @@ def get_cl_lineages(locDir, date):
 	# for now, use lineages metadata created using patch
 	#r = requests.get('https://raw.githubusercontent.com/outbreak-info/' +
 					 #'outbreak.info/master/curated_reports_prep/lineages.yml')
-	os.system("wget -O {0}/lineages{0}.yml https://raw.githubusercontent.com/outbreak-info/outbreak.info/master/curated_reports_prep/lineages.yml --no-check-certificate".format(locDir, date))
+	os.system("wget -O {0}/lineages{1}.yml https://raw.githubusercontent.com/outbreak-info/outbreak.info/master/curated_reports_prep/lineages.yml --no-check-certificate".format(locDir, date))
 	# r = requests.get('https://raw.githubusercontent.com/cov-lineages' +
 	#                  '/lineages-website/master/data/lineages.yml')
 	#if r.status_code == 200:
@@ -183,7 +183,6 @@ if __name__ == '__main__':
 		date = 'latest'
 	# # get data from UShER
 	print('Downloading a new global tree')
-	print(url)
 	download_tree(locDir, url, date)
 	print('Getting outbreak data')
 	get_curated_lineage_data(locDir, date)
@@ -227,6 +226,6 @@ if __name__ == '__main__':
 	barcode = "usher_barcodes_" + date + ".csv"
 	df_barcodes.to_csv(os.path.join(locDir, barcode))
 	# delete files generated along the way that aren't needed anymore
-	print('Cleaning up')
+	#print('Cleaning up')
 	#os.remove(lineagePath)
 	#os.remove(os.path.join(locDir, "public-latest.all.masked.pb.gz"))
