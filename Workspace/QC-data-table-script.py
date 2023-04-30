@@ -120,8 +120,8 @@ if __name__ == "__main__":
 			ORF_depth.append(float(subprocess.getoutput(step9_cmd).strip()))
 			step10_cmd = "bedtools coverage -mean -a " + ref_path + "SARS-CoV-2_ORF_full.bed -b " + analysis_input + sample + "_ivartrim_sorted.bam | awk '($5>= 100) {++n} END {print n+0}'"
 			ORF_100xdepth.append(float(subprocess.getoutput(step10_cmd).strip()))
-			spike_breadth.append(subprocess.getoutput("bedtools coverage -a {0}spike.bed -b {1}{2}_ivartrim_sorted.bam | cut -f7 ".format(ref_path, analysis_input, sample)))
-			spike_depth .append(subprocess.getoutput("bedtools coverage -mean -a {0}spike.bed -b {1}{2}_ivartrim_sorted.bam | cut -f4 ".format(ref_path, analysis_input, sample)))
+			spike_breadth.append(subprocess.getoutput("bedtools coverage -a {0}spike.bed -b {1}{2}_ivartrim_sorted.bam | cut -f8 ".format(ref_path, analysis_input, sample)))
+			spike_depth .append(subprocess.getoutput("bedtools coverage -mean -a {0}spike.bed -b {1}{2}_ivartrim_sorted.bam | cut -f5 ".format(ref_path, analysis_input, sample)))
 		else:
 			genome_breadth.append("NA")
 			genome_depth.append("NA")
