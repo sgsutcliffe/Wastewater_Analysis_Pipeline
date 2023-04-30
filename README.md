@@ -1,11 +1,11 @@
 # Running Wastewater Analysis Instructions
 
-A pipeline for SARS-CoV-2 analysis on wastewater samples. Created specifically for my needs of analyzing pair-short-read sequences from tiled-amplicon PCR using Arctic V4.1 primer-set of SARS-CoV-2. The pipeline is under active development as of April 19, 2023, and I will be adding features and updates to make it more versatile. It is largely to python scripts. The first includes sample preprocessing, Freyja relative abundance estimates of lineages, and mutation calling. The second runs a sample quality control pipeline and outputs a MultiQC report and quantative report.
+A pipeline for SARS-CoV-2 analysis on wastewater samples. Created specifically for my needs of analyzing pair-short-read sequences from tiled-amplicon PCR using Arctic primer-set of SARS-CoV-2. It is largely two python scripts. The first includes sample preprocessing, Freyja relative abundance estimates of lineages, and mutation identification. The second runs quality control pipeline and outputs a MultiQC report and quantative report.
 
 You can install all the software required (below) to run the pipeline, which is a lot, or build the singularity container to run everything.
 
 ## Note:
-Pipeline was developed for short-paired end sequences (150bp) based on tile-amplicon sequencing with Arctic V4.1 primers. Library preparation was done with Nextera kits. We make some assumptions. 1) You want to keep reads without primers detected (iVar) due to Nextera library preparation.
+Pipeline was developed for short-paired end sequences (150bp) based on tile-amplicon sequencing with Arctic primers. It was designed for sequences with library preparation done with Nextera kits. We make the assumption you want to keep reads without primers detected (iVar) due to Nextera library preparation.
 
 Dependencies (versions listed have been tested):
 - Python 3 (tested on 3.9.12)
