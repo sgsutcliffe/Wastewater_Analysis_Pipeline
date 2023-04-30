@@ -12,24 +12,22 @@ import argparse
 
 #ssl._create_default_https_context = ssl._create_unverified_context
 
-
-def download_tree(locDir, url):
-	treePath = os.path.join(locDir, "public-latest.all.masked.pb.gz")
+def download_tree(locDir, url, date):
+	treePath = os.path.join(locDir, "public-{0}.all.masked.pb.gz".format(date))
 	urllib.request.urlretrieve(url, treePath)
 	return treePath
 
 
-def convert_tree(locDir):
-	print(locDir)
-	treePath = os.path.join(locDir, "public-latest.all.masked.pb.gz")
-	varCmd = f"matUtils extract -i {treePath} -C lineagePaths.txt -d {locDir}"
+def convert_tree(locDir, date):
+	treePath = os.path.join(locDir, "public-{0}.all.masked.pb.gz".format(date))
+	varCmd = f"matUtils extract -i {treePath} -C lineagePaths{date}.txt -d {locDir}"
 	sys.stdout.flush()  # force python to flush
 	completed = subprocess.run(varCmd, shell=True, executable="/bin/bash",
 							   stdout=subprocess.DEVNULL)
 	return completed
 
 
-def get_curated_lineage_data(locDir):
+def get_curated_lineage_data(locDir, date):
 	os.system("wget -O {0}/curated_lineages.json https://raw.githubusercontent.com/outbreak-info/outbreak.info/master/web/src/assets/genomics/curated_lineages.json".format(locDir))
 	#url2 = "https://raw.githubusercontent.com/outbreak-info/outbreak.info/"\
 		   #"master/web/src/assets/genomics/curated_lineages.json"
@@ -38,11 +36,11 @@ def get_curated_lineage_data(locDir):
 											#"curated_lineages.json"))
 
 
-def get_cl_lineages(locDir):
+def get_cl_lineages(locDir, date):
 	# for now, use lineages metadata created using patch
 	#r = requests.get('https://raw.githubusercontent.com/outbreak-info/' +
 					 #'outbreak.info/master/curated_reports_prep/lineages.yml')
-	os.system("wget -O {0}/lineages.yml https://raw.githubusercontent.com/outbreak-info/outbreak.info/master/curated_reports_prep/lineages.yml --no-check-certificate".format(locDir))
+	os.system("wget -O {0}/lineages{0}.yml https://raw.githubusercontent.com/outbreak-info/outbreak.info/master/curated_reports_prep/lineages.yml --no-check-certificate".format(locDir, date))
 	# r = requests.get('https://raw.githubusercontent.com/cov-lineages' +
 	#                  '/lineages-website/master/data/lineages.yml')
 	#if r.status_code == 200:
@@ -182,20 +180,17 @@ if __name__ == '__main__':
 		day = date[8:10]
 		url =  "http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/{0}/{1}/{2}/public-{0}-{1}-{2}.all.masked.pb.gz".format(year, month, day)
 	else:
-		url = "http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.all.masked.pb.gz"
-		date = subprocess.check_output("curl http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.version.txt | awk -F'[()]' '{print $2}'", shell=True)
-		date = date.decode("utf-8").split("\n")
-		date = date[0]
+		date = 'latest'
 	# # get data from UShER
 	print('Downloading a new global tree')
 	print(url)
-	download_tree(locDir, url)
+	download_tree(locDir, url, date)
 	print('Getting outbreak data')
-	get_curated_lineage_data(locDir)
+	get_curated_lineage_data(locDir, date)
 	print("Converting tree info to barcodes")
-	convert_tree(locDir)  # returns paths for each lineage
+	convert_tree(locDir, date)  # returns paths for each lineage
 	# Now parse into barcode form
-	lineagePath = os.path.join(locDir, "lineagePaths.txt")
+	lineagePath = os.path.join(locDir, "lineagePaths{0}.txt".format(date))
 	print('Building barcodes from global phylogenetic tree')
 	df = pd.read_csv(lineagePath, sep='\t')
 	print('Parse Tree Paths')
@@ -208,25 +203,30 @@ if __name__ == '__main__':
 	df_barcodes = check_mutation_chain(df_barcodes)
 	# get lineage metadata from cov-lineages
 	print('get lineage metadata from cov-lineages')
-	get_cl_lineages(locDir)
+	get_cl_lineages(locDir, date)
 	# as default:
 	# since usher tree can be ahead of cov-lineages,
 	# we drop lineages not in cov-lineages
 	noncl=True
 	if noncl:
 		# read linages.yml file
-		with open(os.path.join(locDir, 'lineages.yml'), 'r') as f:
+		with open(os.path.join(locDir, 'lineages{0}.yml'.format(date)), 'r') as f:
 			try:
 				lineages_yml = yaml.safe_load(f)
 			except yaml.YAMLError as exc:
-				raise ValueError('Error in lineages.yml file: ' + str(exc))
+				raise ValueError('Error in lineages{0}.yml file: '.format(date) + str(exc))
 		lineageNames = [lineage['name'] for lineage in lineages_yml]
 		df_barcodes = df_barcodes.loc[df_barcodes.index.isin(lineageNames)]
 	else:
 		print("Including lineages not yet in cov-lineages.")
+	if not(args.date):
+		url = "http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-{0}.all.masked.pb.gz".format(date)
+		date = subprocess.check_output("curl http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-{0}.version.txt | awk -F'[()]' '{print $2}'".format(date), shell=True)
+		date = date.decode("utf-8").split("\n")
+		date = date[0]
 	barcode = "usher_barcodes_" + date + ".csv"
 	df_barcodes.to_csv(os.path.join(locDir, barcode))
 	# delete files generated along the way that aren't needed anymore
 	print('Cleaning up')
-	os.remove(lineagePath)
-	os.remove(os.path.join(locDir, "public-latest.all.masked.pb.gz"))
+	#os.remove(lineagePath)
+	#os.remove(os.path.join(locDir, "public-latest.all.masked.pb.gz"))
