@@ -220,7 +220,7 @@ if __name__ == '__main__':
 	else:
 		print("Including lineages not yet in cov-lineages.")
 	if not(args.date):
-		down_date = subprocess.check_output("curl http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.version.txt | awk -F'[()]' '{print $2}'", shell=True)
+		date = subprocess.check_output("curl http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.version.txt | awk -F'[()]' '{print $2}'", shell=True)
 		date = date.decode("utf-8").split("\n")
 		date = date[0]
 	barcode = "usher_barcodes_" + date + ".csv"
