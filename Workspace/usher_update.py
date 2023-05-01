@@ -181,6 +181,7 @@ if __name__ == '__main__':
 		url =  "http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/{0}/{1}/{2}/public-{0}-{1}-{2}.all.masked.pb.gz".format(year, month, day)
 	else:
 		date = 'latest'
+		url = "http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.all.masked.pb.gz"
 	# # get data from UShER
 	print('Downloading a new global tree')
 	download_tree(locDir, url, date)
