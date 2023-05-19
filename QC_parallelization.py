@@ -1,5 +1,5 @@
 #!/bin/python3.6
-#Version QC_parallelization_V3.1
+#Version QC_parallelization_V4
 #Script for parrallelization of QC steps on WW analysis
 import sys
 import time
@@ -28,6 +28,8 @@ from argparse import ArgumentParser
 # Naming output of already analyzed files option
 # Removes Picard step
 # Updates the input for QC-table script
+#In version 4
+#Adds parallelization to QC-data-table-script-V2.py
 
 #time feedback
 start_time = time.time()
@@ -214,6 +216,9 @@ if __name__ == "__main__":
 	threads = int(args.threads)
 	print('Using ' + str(threads) + 'threads per ' + str(nb_sim_process) + ' samples analyzed simultaneously')
 	
+	#Theoretically the number of CPUs available should be threads * nb_sim_process which is what we can request for QC table script
+	total_CPU = int(nb_sim_process) * int(threads)
+
 	#Ceate file that records samples that have already been analyzed for QC
 	analyzed_list=args.analyzed
 	os.system("/bin/touch {0}{1}".format(workspace_path, analyzed_list))
@@ -266,6 +271,6 @@ if __name__ == "__main__":
 		os.system("multiqc {0}qc_results/ -o {0}qc_results/multiqc_data".format(output))
 
 	#Step 7: Generate a quantative report
-	os.system("python3 {0}QC-data-table-script.py {0} {1} {2} {3}qc_results/ {3}qc_results/ {4}".format(workspace_path, input_folder, samples_list_file, output, insertbed))
+	os.system("python3 {0}QC-data-table-script.py {0} {1} {2} {3}qc_results/ {3}qc_results/ {4} {5}".format(workspace_path, input_folder, samples_list_file, output, insertbed, total_CPU))
 	
 	
