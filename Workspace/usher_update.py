@@ -1,6 +1,5 @@
 #version
-#usher_update_V4
-import urllib.request
+#usher_update_V5
 import os
 import sys
 import subprocess
@@ -14,8 +13,9 @@ import argparse
 
 def download_tree(locDir, url, date):
 	treePath = os.path.join(locDir, "public-{0}.all.masked.pb.gz".format(date))
-	urllib.request.urlretrieve(url, treePath)
-	return treePath
+	os.system("wget -O {0} {1}".format(treePath, url))
+	#urllib.request.urlretrieve(url, treePath)
+	#return treePath
 
 
 def convert_tree(locDir, date):
@@ -66,7 +66,6 @@ def convert_to_barcodes(df):
 								 df.loc[clade, 'from_tree_root']}, name=clade)
 		df_barcodes = pd.concat((df_barcodes, cladeSeries), axis=1)
 
-	print('separating combined splits')
 	df_barcodes = df_barcodes.T
 	df_barcodes = df_barcodes.drop(columns='')
 	df_barcodes = df_barcodes.fillna(0)
@@ -184,6 +183,7 @@ if __name__ == '__main__':
 		url = "http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.all.masked.pb.gz"
 	# # get data from UShER
 	print('Downloading a new global tree')
+	print(url)
 	download_tree(locDir, url, date)
 	print('Getting outbreak data')
 	get_curated_lineage_data(locDir, date)
