@@ -1,6 +1,6 @@
 #!/bin/python3.6
 #Version
-#Freyja_parallelization_V5.2
+#Freyja_parallelization_V6
 #Script for analysis of FASTQ files via Freyja
 import sys
 import time
@@ -21,6 +21,10 @@ from argparse import ArgumentParser
 # Cleaned up parameters with argparse
 # Integrated File Checking
 
+#Update in Version 6
+# Added parallel file-checking
+# Pipe sam files into samtools
+
 
 #Time feedback
 start_time = time.time()
@@ -31,26 +35,26 @@ def run_core_iPMVC(wp_path,current_sample, nb_t_profiling, smpl_path, usherbarco
 	os.system("fastp -i {2}{0}_R1_001.fastq.gz -I {2}{0}_R2_001.fastq.gz -o {3}{0}_R1_001_trimmed_1.fastq.gz -O {3}{0}_R2_001_trimmed_2.fastq.gz -l 70 -x --cut_tail --cut_tail_mean_quality 20 --detect_adapter_for_pe --thread {1} --json {3}{0}.fastp.json".format(current_sample, nb_t_profiling, smpl_path, output))
 	
 	#Decontaminate human reads 
-	os.system("bwa mem {3}Homo_sapiens.GRCh38.fa {0}{1}_R1_001_trimmed_1.fastq.gz {0}{1}_R2_001_trimmed_2.fastq.gz -t {2} > {0}{1}.sam".format(output, current_sample, nb_t_profiling, wp_path))
-	#Replace with kraken
-	os.system("samtools view -bS {0}{1}.sam > {0}{1}.bam && rm {0}{1}.sam ".format(output, current_sample))
-	os.system("samtools view -b -f 12 -F 256 {0}{1}.bam > {0}{1}_human_decon.bam ".format(output, current_sample))
-	os.system("samtools sort -n -m 5G -@ {2} {0}{1}_human_decon.bam -o {0}{1}_human_decon_sorted.bam ".format(output, current_sample, nb_t_profiling))
+    #bwa mem Workspace/Homo_sapiens.GRCh38.fa output2/sample16_L00M_R1_001_trimmed_1.fastq.gz output2/sample16_L00M_R2_001_trimmed_2.fastq.gz -t 4 | samtools view -bS - | samtools view -f 12 -F 256 --threads 4 - | samtools sort -n -m 5G --threads 4 - | tee test_sorted.bam | samtools fastq -@ 4 - -1 test.fastq.gz -2 test2.fastq.gz
+	os.system("bwa mem {3}Homo_sapiens.GRCh38.fa {0}{1}_R1_001_trimmed_1.fastq.gz {0}{1}_R2_001_trimmed_2.fastq.gz -t {2} | \
+	   samtools view -bS --threads {2} - | \
+	   samtools view -bS --threads {2} -f 12 -F 256 - | \
+	   samtools sort -n -m 5G --threads {2} -o {0}{1}_human_decon_sorted.bam - \
+	   ".format(output, current_sample, nb_t_profiling, wp_path))
 	os.system("samtools fastq -@ {2} {0}{1}_human_decon_sorted.bam -1 {0}{1}_R1_001_decon_1.fastq.gz -2 {0}{1}_R2_001_decon_2.fastq.gz".format(output, current_sample, nb_t_profiling))
-		
+
 	#Align reads to reference genome 
-	os.system("bwa mem {0}MN908947_3.fa {3}{1}_R1_001_decon_1.fastq.gz {3}{1}_R2_001_decon_2.fastq.gz -t {2} > {3}{1}_preprocessed.sam".format(wp_path, current_sample, nb_t_profiling, output))
-	
-	#Compress, sort and filter alignment
-	
-	os.system("samtools view -bS {0}{1}_preprocessed.sam > {0}{1}_preprocessed.bam && rm {0}{1}_preprocessed.sam".format(output, current_sample))
-	os.system("samtools sort {0}{1}_preprocessed.bam -o {0}{1}_preprocessed_sorted.bam".format(output, current_sample))
+	os.system("bwa mem {0}MN908947_3.fa {3}{1}_R1_001_decon_1.fastq.gz {3}{1}_R2_001_decon_2.fastq.gz -t {2} | \
+	   samtools view -bS --threads {2} - | \
+	   samtools sort -m 5G --threads {2} -o {3}{1}_preprocessed_sorted.bam - ".format(wp_path, current_sample, nb_t_profiling, output))
+
 	#In this version I am making a big change with -m option and setting minimum length to 70
 	#We also now include reads with no primers due to Nextera library prep
 	os.system("ivar trim -e -m 70 -i {2}{1}_preprocessed_sorted.bam -b {3} -p {2}{1}_ivartrim".format(wp_path, current_sample,output, primerbed))
-	# Freyja commnad
 	os.system("samtools sort -o {0}{1}_ivartrim_sorted.bam {0}{1}_ivartrim.bam".format(output, current_sample))
 	os.system("samtools index {0}{1}_ivartrim_sorted.bam".format(output, current_sample))
+	
+	# Freyja commnad
 	os.system("freyja variants {2}{1}_ivartrim_sorted.bam --variants {2}{1}_variantout --depths {2}{1}_depthout --ref {0}MN908947_3.fa".format(wp_path, current_sample, output))
 	os.system("freyja demix {3}{1}_variantout.tsv {3}{1}_depthout --barcodes {0}{2} --output {3}results/{1}_output".format(wp_path, current_sample, usherbarcodes, output))
 	# Annotate the iVar variant file
@@ -223,6 +227,9 @@ if __name__ == "__main__":
 	threads = int(args.threads)
 	print('Using ' + str(threads) + 'threads per ' + str(nb_sim_process) + ' samples analyzed simultaneously')
 	
+    #Theoretically the number of CPUs available should be threads * nb_sim_process which is what we can request for QC table script
+	total_CPU = int(nb_sim_process) * int(threads)
+	
 	### STARTING ANALYSIS ###
 	print("File checking complete, running analysis")
 	#Analyze samples in parrallel (4 by default or whichever number selected by --parallel)
@@ -267,5 +274,5 @@ if __name__ == "__main__":
 
 	#Run file checking
 	if (args.file_check):
-		os.system("python3 {0}file_checking.py {0}{1} {2} {3}".format(workspace_path, samples_list_file, output, sample_path))
+		os.system("python3 {0}file_checking.py {0}{1} {2} {3}".format(workspace_path, samples_list_file, output, sample_path, total_CPU))
 		os.system("Rscript {1}file_check_visualize.R {0}File_Check_Output.txt {0}".format(output, workspace_path))
