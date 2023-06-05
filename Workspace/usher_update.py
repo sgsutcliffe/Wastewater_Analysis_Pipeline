@@ -13,8 +13,9 @@ import argparse
 
 def download_tree(locDir, url, date):
 	treePath = os.path.join(locDir, "public-{0}.all.masked.pb.gz".format(date))
-	os.system("wget -O {0} {1}".format(treePath, url))
-	#urllib.request.urlretrieve(url, treePath)
+	if not os.path.exists(treePath):
+		os.system("wget -O {0} {1}".format(treePath, url))
+		#urllib.request.urlretrieve(url, treePath)
 	#return treePath
 
 
@@ -28,24 +29,17 @@ def convert_tree(locDir, date):
 
 
 def get_curated_lineage_data(locDir, date):
-	os.system("wget -O {0}/curated_lineages{1}.json https://raw.githubusercontent.com/outbreak-info/outbreak.info/master/web/src/assets/genomics/curated_lineages.json".format(locDir, date))
-	#url2 = "https://raw.githubusercontent.com/outbreak-info/outbreak.info/"\
-		   #"master/web/src/assets/genomics/curated_lineages.json"
-	#urllib.request.urlretrieve(url2,
-							   #os.path.join(locDir,
-											#"curated_lineages.json"))
+	target = "{0}/curated_lineages{1}.json".format(locDir,date)
+
+	if not os.path.exists(target):
+		os.system("wget -O {0}  https://raw.githubusercontent.com/outbreak-info/outbreak.info/master/web/src/assets/genomics/curated_lineages.json".format(target))
 
 
 def get_cl_lineages(locDir, date):
-	# for now, use lineages metadata created using patch
-	#r = requests.get('https://raw.githubusercontent.com/outbreak-info/' +
-					 #'outbreak.info/master/curated_reports_prep/lineages.yml')
-	os.system("wget -O {0}/lineages{1}.yml https://raw.githubusercontent.com/outbreak-info/outbreak.info/master/curated_reports_prep/lineages.yml --no-check-certificate".format(locDir, date))
-	# r = requests.get('https://raw.githubusercontent.com/cov-lineages' +
-	#                  '/lineages-website/master/data/lineages.yml')
-	#if r.status_code == 200:
-		#with open(os.path.join(locDir, 'lineages.yml'), 'w+') as f:
-			#f.write(r.text)
+	target = "{0}/lineages{1}.yml".format(locDir, date)
+
+	if not os.path.exists(target):
+		os.system("wget -O {0}  https://raw.githubusercontent.com/outbreak-info/outbreak.info/master/curated_reports_prep/lineages.yml --no-check-certificate".format(target))
 
 def parse_tree_paths(df):
 	df = df.set_index('clade')
