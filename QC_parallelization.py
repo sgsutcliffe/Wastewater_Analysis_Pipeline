@@ -207,9 +207,9 @@ if __name__ == "__main__":
 	if not os.path.exists("{0}SARS-CoV-2.{1}.insert.bed".format(workspace_path, args.arctic)):
 		print("Downloading {0} insert-scheme".format(args.arctic))
 		if args.arctic in ["V1", "V2", "V3"]:
-			os.system("wget -O {0}SARS-CoV-2.{1}.insert.bed https://raw.githubusercontent.com/artic-network/primer-schemes/master/nCoV-2019/{1}}/nCoV.insert.bed".format(workspace_path, args.arctic))
+			os.system("wget -O {0}SARS-CoV-2.{1}.insert.bed https://raw.githubusercontent.com/artic-network/primer-schemes/master/nCoV-2019/{1}/nCoV.insert.bed".format(workspace_path, args.arctic))
 		elif args.arctic in ["V4", "V4.1"]:
-			os.system("wget -O {0}SARS-CoV-2.{1}.insert.bed https://raw.githubusercontent.com/artic-network/primer-schemes/master/nCoV-2019/{1}}/SARS-CoV-2.insert.bed".format(workspace_path, args.arctic))
+			os.system("wget -O {0}SARS-CoV-2.{1}.insert.bed https://raw.githubusercontent.com/artic-network/primer-schemes/master/nCoV-2019/{1}/SARS-CoV-2.insert.bed".format(workspace_path, args.arctic))
 		else:
 			sys.exit("Pipeline only supports artic-network insert-scheme (V1,V2,V3,V4,V4.1). Other schemes need to be downloaded by user seperately and named SARS-CoV-2.Version.insert.bed naming")
 	print("Using {0} insert-scheme".format(args.arctic))
