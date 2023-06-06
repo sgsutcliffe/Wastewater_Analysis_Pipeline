@@ -274,5 +274,5 @@ if __name__ == "__main__":
 
 	#Run file checking
 	if (args.file_check):
-		os.system("python3 {0}file_checking.py {0}{1} {2} {3}".format(workspace_path, samples_list_file, output, sample_path, total_CPU))
+		os.system("python3 {0}file_checking.py {0}{1} {2} {3} {4}".format(workspace_path, samples_list_file, output, sample_path, total_CPU))
 		os.system("Rscript {1}file_check_visualize.R {0}File_Check_Output.txt {0}".format(output, workspace_path))
