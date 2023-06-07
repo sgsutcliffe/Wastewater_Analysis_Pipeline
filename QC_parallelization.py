@@ -51,9 +51,9 @@ def run_QC(wp_path, current_sample, nb_t_profiling, smpl_path, output, input_fol
 	#	Step 3: Check for contaminants (initial files vs cleaned slides)
 	# 	Note: Step 3 takes a lot of RAM so I might want to run this step seperately
 	#	Step 3a: Initial files
-	os.system("kraken2 --db {4} --threads {1} --report {3}qc_results/{0}.initial.kraken2.report.txt --paired {2}{0}_R1_001.fastq.gz {2}{0}_R2_001.fastq.gz --output {3}qc_results/{0}initial.kraken2.output.txt".format(current_sample, nb_t_profiling, smpl_path, output, kraken_db))
+	os.system("kraken2 --db {4} --threads {1} --report {3}qc_results/{0}.initial.kraken2.report.txt --paired {2}{0}_R1_001.fastq.gz {2}{0}_R2_001.fastq.gz --output {3}qc_results/{0}.initial.kraken2.output.txt".format(current_sample, nb_t_profiling, smpl_path, output, kraken_db))
 	# 	Step 3b: Files cleaned (human reads removed) and used in analysis
-	os.system("kraken2 --db {4} --threads {1} --report {2}qc_results/{0}.final.kraken2.report.txt --paired {3}{0}_R1_001_decon_1.fastq.gz {3}{0}_R2_001_decon_2.fastq.gz --output {3}qc_results/{0}initial.kraken2.output.txt".format(current_sample, nb_t_profiling, output, input_folder,kraken_db))
+	os.system("kraken2 --db {4} --threads {1} --report {2}qc_results/{0}.final.kraken2.report.txt --paired {3}{0}_R1_001_decon_1.fastq.gz {3}{0}_R2_001_decon_2.fastq.gz --output {3}qc_results/{0}.final.kraken2.output.txt".format(current_sample, nb_t_profiling, output, input_folder,kraken_db))
 	#	Step 4: Alignment-level QC (both with bwa of human decon reads and iVar)
 	#	Step4a: Alingment-level QC on alignment of human decontaminated reads to reference genome (preiVar)
 	os.system("samtools flagstat --threads {2} {3}{1}_preprocessed_sorted.bam > {0}qc_results/{1}.preiVar.flagstat".format(output, current_sample, nb_t_profiling,input_folder))
