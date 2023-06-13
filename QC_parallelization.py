@@ -215,7 +215,7 @@ if __name__ == "__main__":
 	print("Using {0} insert-scheme".format(args.arctic))
 	insertbed = "{0}SARS-CoV-2.{1}.insert.bed".format(workspace_path, args.arctic)
 
-	#Number of samples being analysed in parallel (Default 4 samples at a time)
+	#Number of samples being analyzed in parallel (Default 4 samples at a time)
 	nb_sim_process = int(args.parallel)
 	print('Running ' + str(nb_sim_process) + ' of samples simultaneously')
 	
@@ -236,8 +236,8 @@ if __name__ == "__main__":
 	#Analyze samples in parrallel (4 by default or whichever number selected by --parallel)
 	liste_index_sample = range(0, num_samples, nb_sim_process)
 	for i in liste_index_sample:
-		# create a list that will record the samples that have already been analysed
-		already_analysed_samples_list=[]
+		# create a list that will record the samples that have already been analyzed
+		already_analyzed_samples_list=[]
 		with open("{0}{1}".format(workspace_path, analyzed_list)) as f:
 			already_analyzed_samples_list = f.readlines()
 		index_line = 0
