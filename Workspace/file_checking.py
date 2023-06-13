@@ -18,7 +18,7 @@ from multiprocessing import Pool, Manager
 import time
 from functools import partial
 
-def file_check(lst, sample, path_to_output, path_to_samples):
+def file_check(lst, sample):
 	path_to_results = path_to_output
 	globals()["row_"+str(sample)] = []
 	globals()["row_"+str(sample)].append(sample)
@@ -176,7 +176,7 @@ if __name__ == "__main__":
 	dfs_list = Manager().list()
 	pool = Pool(processes=nb_sim_process)
 	samples = lst_samples
-	res = pool.map_async(partial(file_check, dfs_list), samples, path_to_output, path_to_samples)
+	res = pool.map_async(partial(file_check, dfs_list), samples)
 	res.wait()
 	dfs = pd.concat(dfs_list, ignore_index = True)
 	dfs.to_csv(filename, sep='\t')
