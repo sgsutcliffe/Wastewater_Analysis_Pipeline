@@ -47,9 +47,9 @@ def pull_qc_info(lst, sample):
 	if glob.glob("{0}{1}_ivartrim_sorted.bam".format(analysis_input, sample)):
 		globals()["row_"+str(sample)].append(subprocess.getoutput("bedtools coverage -a {0}genome.bed -b {1}{2}_ivartrim_sorted.bam | cut -f7 ".format(ref_path, analysis_input, sample)))
 		globals()["row_"+str(sample)].append(subprocess.getoutput("bedtools coverage -mean -a {0}genome.bed -b {1}{2}_ivartrim_sorted.bam | cut -f4 ".format(ref_path, analysis_input, sample)))
-		step7_cmd = "bedtools coverage -mean -a " + ref_path + insertbed + " -b " + analysis_input + sample + "_ivartrim_sorted.bam | awk '{ sum += $7; ++n} END {print sum/n+0}'"
+		step7_cmd = "bedtools coverage -mean -a " + insertbed + " -b " + analysis_input + sample + "_ivartrim_sorted.bam | awk '{ sum += $7; ++n} END {print sum/n+0}'"
 		globals()["row_"+str(sample)].append(float(subprocess.getoutput(step7_cmd).strip()))
-		step8_cmd = "bedtools coverage -mean -a " + ref_path + insertbed + " -b " + analysis_input + sample + "_ivartrim_sorted.bam | awk '($7>= 100) {++n} END {print n+0}'"
+		step8_cmd = "bedtools coverage -mean -a " + insertbed + " -b " + analysis_input + sample + "_ivartrim_sorted.bam | awk '($7>= 100) {++n} END {print n+0}'"
 		globals()["row_"+str(sample)].append(float(subprocess.getoutput(step8_cmd).strip()))
 		step9_cmd = "bedtools coverage -mean -a " + ref_path + "SARS-CoV-2_ORF_full.bed -b " + analysis_input + sample + "_ivartrim_sorted.bam | awk '{ sum += $5; ++n} END { print sum /n}'"
 		globals()["row_"+str(sample)].append(float(subprocess.getoutput(step9_cmd).strip()))
