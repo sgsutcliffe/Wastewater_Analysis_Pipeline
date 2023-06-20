@@ -130,7 +130,7 @@ if __name__ == "__main__":
 	if requested_cpu >= os.cpu_count():
 		nb_sim_process = os.cpu_count() - 1
 	else:
-		nb_sim_process = requested_cpu() -1
+		nb_sim_process = requested_cpu -1
 
 	#Set up a dataframe to receive the output 
 	column_names = [
