@@ -1,3 +1,7 @@
+## Overview
+
+![](Misc/Analysis%20Workflow.png)
+
 # Running Wastewater Analysis Instructions
 
 A pipeline for SARS-CoV-2 analysis on wastewater samples. Created specifically for my needs of analyzing pair-short-read sequences from tiled-amplicon PCR using Arctic primer-set of SARS-CoV-2. It is largely two python scripts. The first includes sample preprocessing, Freyja relative abundance estimates of lineages, and mutation identification. The second runs quality control pipeline and outputs a MultiQC report and quantative report.
@@ -177,7 +181,4 @@ In this example I made directories /var/tmp and /tmp which are bound to the cont
 singularity exec -C -B ${PWD}:${HOME},/your/path/var/tmp:/var/tmp\,/your/path/tmp:/tmp python ...
 ```
 
-## Overview
-
-![](Misc/Analysis%20Workflow.png)
 
